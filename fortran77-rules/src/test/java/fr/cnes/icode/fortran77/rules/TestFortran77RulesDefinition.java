@@ -16,7 +16,7 @@ public class TestFortran77RulesDefinition {
 
         rulesDefinition.define();
 
-        Assertions.assertEquals(65, rulesDefinition.list().size());
+        Assertions.assertEquals(82, rulesDefinition.list().size());
     }
 
 }

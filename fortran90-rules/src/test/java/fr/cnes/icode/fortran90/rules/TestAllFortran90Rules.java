@@ -99,7 +99,24 @@ public class TestAllFortran90Rules implements ICodeCheckerTester {
                 {"/F90/REF/Variable/error.f90", "/F90/REF/Variable/noError.f90", new int[]{19, 19}, new String[]{"subroutine incr", "subroutine incr"}, F90REFVariable.class},
                 {"/F90/TYPE/Derivate/error.f90", "/F90/TYPE/Derivate/noError.f90", new int[]{11, 34}, new String[]{"program PERSONNEL", "subroutine AFFICHE"}, F90TYPEDerivate.class},
                 {"/F90/TYPE/Integer/error.f90", "/F90/TYPE/Integer/noError.f90", new int[]{5, 13}, new String[]{"MODULE ma_precision", "MODULE ma_precision"}, F90TYPEInteger.class},
-                {"/F90/TYPE/Real/error.f90", "/F90/TYPE/Real/noError.f90", new int[]{13, 14, 15, 16, 17, 18, 55, 56, 57, 58, 59, 60}, new String[]{"MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI"}, F90TYPEReal.class}
+                {"/F90/TYPE/Real/error.f90", "/F90/TYPE/Real/noError.f90", new int[]{13, 14, 15, 16, 17, 18, 55, 56, 57, 58, 59, 60}, new String[]{"MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI"}, F90TYPEReal.class},
+                {"/EUM/INST/Namelist/error.f90", "/EUM/INST/Namelist/noError.f90", new int[]{3}, new String[]{"program essai"}, EUMINSTNamelist.class},
+                {"/EUM/INST/BlockData/error.f90", "/EUM/INST/BlockData/noError.f90", new int[]{3, 4}, new String[]{"program essai", "program essai"}, EUMINSTBlockData.class},
+                {"/EUM/INST/Backspace/error.f90", "/EUM/INST/Backspace/noError.f90", new int[]{4}, new String[]{"program essai"}, EUMINSTBackspace.class},
+                {"/EUM/INST/NoData/error.f90", "/EUM/INST/NoData/noError.f90", new int[]{3, 4}, new String[]{"program essai", "program essai"}, EUMINSTNoData.class},
+                {"/EUM/PRES/NoTabs/error.f90", "/EUM/PRES/NoTabs/noError.f90", new int[]{3}, new String[]{"program essai"}, EUMPRESNoTabs.class},
+                {"/EUM/PRES/NoEmptyComment/error.f90", "/EUM/PRES/NoEmptyComment/noError.f90", new int[]{4}, new String[]{"program essai"}, EUMPRESNoEmptyComment.class},
+                {"/EUM/PRES/BlankLines/error.f90", "/EUM/PRES/BlankLines/noError.f90", new int[]{6}, new String[]{"program essai"}, EUMPRESBlankLines.class},
+                {"/EUM/INST/PercentBlank/error.f90", "/EUM/INST/PercentBlank/noError.f90", new int[]{6}, new String[]{"program essai"}, EUMINSTPercentBlank.class},
+                {"/EUM/PRES/NoEndLineComment/error.f90", "/EUM/PRES/NoEndLineComment/noError.f90", new int[]{3}, new String[]{"program essai"}, EUMPRESNoEndLineComment.class},
+                {"/EUM/INST/Continuation/error.f90", "/EUM/INST/Continuation/noError.f90", new int[]{3}, new String[]{"program essai"}, EUMINSTContinuation.class},
+                {"/EUM/INST/CompilerExt/error.f90", "/EUM/INST/CompilerExt/noError.f90", new int[]{3, 4}, new String[]{"program essai", "program essai"}, EUMINSTCompilerExt.class},
+                {"/EUM/INST/Continue/error.f90", "/EUM/INST/Continue/noError.f90", new int[]{4}, new String[]{"program essai"}, EUMINSTContinue.class},
+                {"/EUM/PRES/Doxygen/error.f90", "/EUM/PRES/Doxygen/noError.f90", new int[]{5}, new String[]{"program essai"}, EUMPRESDoxygen.class},
+                {"/EUM/PRES/CommentBlock/error.f90", "/EUM/PRES/CommentBlock/noError.f90", new int[]{3}, new String[]{"program essai"}, EUMPRESCommentBlock.class},
+                {"/EUM/PRES/LabelJustify/error.f90", "/EUM/PRES/LabelJustify/noError.f90", new int[]{3}, new String[]{"program essai"}, EUMPRESLabelJustify.class},
+                {"/EUM/DESIGN/OneUnitPerFile/error.f90", "/EUM/DESIGN/OneUnitPerFile/noError.f90", new int[]{1}, new String[]{"module mymod"}, EUMDESIGNOneUnitPerFile.class},
+                {"/EUM/NAME/FileExt/error.txt", "/EUM/NAME/FileExt/noError.f90", new int[]{1}, new String[]{"MAIN PROGRAM"}, EUMNAMEFileExt.class}
         };
     }
 }

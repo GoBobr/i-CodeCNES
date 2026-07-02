@@ -92,7 +92,24 @@ public class TestAllFortran77Rules implements ICodeCheckerTester {
                 {"/F77/REF/Open/error.f", "/F77/REF/Open/noError.f", new int[]{1}, new String[]{"MAIN PROGRAM"}, F77REFOpen.class},
                 {"/F77/REF/Parameter/error.f", "/F77/REF/Parameter/noError.f", new int[]{12, 12, 12, 12}, new String[]{"PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI"}, F77REFParameter.class},
                 {"/F77/TYPE/Basic/error.f", "/F77/TYPE/Basic/noError.f", new int[]{3, 4, 6, 7, 9}, new String[]{"PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI"}, F77TYPEBasic.class},
-                {"/F77/TYPE/Hollerith/error.f", "/F77/TYPE/Hollerith/noError.f", new int[]{4, 4, 5, 8}, new String[]{"PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI"}, F77TYPEHollerith.class}
+                {"/F77/TYPE/Hollerith/error.f", "/F77/TYPE/Hollerith/noError.f", new int[]{4, 4, 5, 8}, new String[]{"PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI"}, F77TYPEHollerith.class},
+                {"/EUM/INST/Namelist/error.f", "/EUM/INST/Namelist/noError.f", new int[]{3}, new String[]{"program essai"}, EUMINSTNamelist.class},
+                {"/EUM/INST/BlockData/error.f", "/EUM/INST/BlockData/noError.f", new int[]{3, 4}, new String[]{"program essai", "program essai"}, EUMINSTBlockData.class},
+                {"/EUM/INST/Backspace/error.f", "/EUM/INST/Backspace/noError.f", new int[]{4}, new String[]{"program essai"}, EUMINSTBackspace.class},
+                {"/EUM/INST/NoData/error.f", "/EUM/INST/NoData/noError.f", new int[]{3, 4}, new String[]{"program essai", "program essai"}, EUMINSTNoData.class},
+                {"/EUM/PRES/NoTabs/error.f", "/EUM/PRES/NoTabs/noError.f", new int[]{3}, new String[]{"program essai"}, EUMPRESNoTabs.class},
+                {"/EUM/PRES/NoEmptyComment/error.f", "/EUM/PRES/NoEmptyComment/noError.f", new int[]{4}, new String[]{"program essai"}, EUMPRESNoEmptyComment.class},
+                {"/EUM/PRES/BlankLines/error.f", "/EUM/PRES/BlankLines/noError.f", new int[]{6}, new String[]{"program essai"}, EUMPRESBlankLines.class},
+                {"/EUM/INST/PercentBlank/error.f", "/EUM/INST/PercentBlank/noError.f", new int[]{3}, new String[]{"program essai"}, EUMINSTPercentBlank.class},
+                {"/EUM/PRES/NoEndLineComment/error.f", "/EUM/PRES/NoEndLineComment/noError.f", new int[]{3}, new String[]{"program essai"}, EUMPRESNoEndLineComment.class},
+                {"/EUM/INST/Continuation/error.f", "/EUM/INST/Continuation/noError.f", new int[]{3}, new String[]{"program essai"}, EUMINSTContinuation.class},
+                {"/EUM/INST/CompilerExt/error.f", "/EUM/INST/CompilerExt/noError.f", new int[]{3}, new String[]{"program essai"}, EUMINSTCompilerExt.class},
+                {"/EUM/INST/Continue/error.f", "/EUM/INST/Continue/noError.f", new int[]{4}, new String[]{"program essai"}, EUMINSTContinue.class},
+                {"/EUM/PRES/Doxygen/error.f", "/EUM/PRES/Doxygen/noError.f", new int[]{5}, new String[]{"program essai"}, EUMPRESDoxygen.class},
+                {"/EUM/PRES/CommentBlock/error.f", "/EUM/PRES/CommentBlock/noError.f", new int[]{3}, new String[]{"program essai"}, EUMPRESCommentBlock.class},
+                {"/EUM/PRES/LabelJustify/error.f", "/EUM/PRES/LabelJustify/noError.f", new int[]{3}, new String[]{"program essai"}, EUMPRESLabelJustify.class},
+                {"/EUM/DESIGN/OneUnitPerFile/error.f", "/EUM/DESIGN/OneUnitPerFile/noError.f", new int[]{1}, new String[]{"module mymod"}, EUMDESIGNOneUnitPerFile.class},
+                {"/EUM/NAME/FileExt/error.txt", "/EUM/NAME/FileExt/noError.f", new int[]{1}, new String[]{"MAIN PROGRAM"}, EUMNAMEFileExt.class}
         };
     }
 }
