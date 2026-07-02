@@ -60,7 +60,7 @@ public class TestAllFortran90Rules implements ICodeCheckerTester {
 				{"/COM/PRES/Data/error.f90", "/COM/PRES/Data/noError.f90", new int[]{3}, new String[]{"daMatTr"}, COMPRESData.class},
                 {"/COM/PRES/Indent/error.f", "/COM/PRES/Indent/noError.f", new int[]{5, 6}, new String[]{"PROGRAM ESSAI", "PROGRAM ESSAI"}, COMPRESIndent.class},
                 {"/COM/PRES/LengthLine/error.f", "/COM/PRES/LengthLine/noError.f", new int[]{7, 9, 18}, new String[]{"PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI"}, COMPRESLengthLine.class},
-                {"/COM/PRES/FileLength/error.f", "/COM/PRES/FileLength/noError.f", new int[]{1502}, new String[]{"subroutine ncdf_getvar_2D_FourByteInt"}, COMPRESFileLength.class},
+                {"/COM/PRES/FileLength/error.f", "/COM/PRES/FileLength/noError.f", new int[]{1772}, new String[]{"subroutine extra_sub_BLOCK"}, COMPRESFileLength.class},
                 {"/COM/PROJECT/Header/error.f90", "/COM/PROJECT/Header/noError.f90", new int[]{0, 11}, new String[]{"No file header existing.", "FUNCTION F"}, COMPROJECTHeader.class},
                 {"/COM/TYPE/Expression/error.f", "/COM/TYPE/Expression/noError.f", new int[]{20, 21, 23, 48}, new String[]{"PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "SUBROUTINE GS_calcul_ecart_echt"}, COMTYPEExpression.class},
                 {"/F90/BLOC/File/error.f", "/F90/BLOC/File/noError.f", new int[]{20}, new String[]{"PROGRAM ESSAI"}, F90BLOCFile.class},

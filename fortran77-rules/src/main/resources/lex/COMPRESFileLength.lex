@@ -62,8 +62,8 @@ BLANK_LINE 	 = {SPACE}*\R
     }
     
     private void checkTotalCodeLines() {
-        if(codeLines > 1000) {
-            setError(location,"There are more than 1000 lines of code in this file: " + codeLines, yyline+1); 
+        if(codeLines > 1500) {
+            setError(location,"There are more than 1500 lines of code in this file: " + codeLines, yyline+1); 
         }
     }
     

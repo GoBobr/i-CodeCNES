@@ -55,7 +55,7 @@ public class TestAllFortran77Rules implements ICodeCheckerTester {
 				{"/COM/MET/RatioComment/error.f", "/COM/MET/RatioComment/noError.f", new int[]{15}, new String[]{"MAIN PROGRAM"}, COMMETRatioComment.class},
                 {"/COM/NAME/Homonymy/error.f", "/COM/NAME/Homonymy/noError.f", new int[]{7, 25, 29}, new String[]{"function f1", "subroutine s1", "function f3"}, COMNAMEHomonymy.class},
 				{"/COM/PRES/Data/error.f", "/COM/PRES/Data/noError.f", new int[]{6}, new String[]{"r"}, COMPRESData.class},
-                {"/COM/PRES/FileLength/error.f", "/COM/PRES/FileLength/noError.f", new int[]{1052}, new String[]{"SUBROUTINE MY_SUB1"}, COMPRESFileLength.class},
+                {"/COM/PRES/FileLength/error.f", "/COM/PRES/FileLength/noError.f", new int[]{1552}, new String[]{"SUBROUTINE MY_SUB1"}, COMPRESFileLength.class},
                 {"/COM/PRES/Indent/error.f", "/COM/PRES/Indent/noError.f", new int[]{6}, new String[]{"PROGRAM ESSAI"}, COMPRESIndent.class},
                 {"/COM/PRES/LengthLine/error.f", "/COM/PRES/LengthLine/noError.f", new int[]{7, 9, 18}, new String[]{"MAIN PROGRAM ESSAI", "MAIN PROGRAM ESSAI", "MAIN PROGRAM ESSAI"}, COMPRESLengthLine.class},
                 {"/COM/PROJECT/Header/error.f", "/COM/PROJECT/Header/noError.f", new int[]{0, 11}, new String[]{"No file header existing.", "FUNCTION F"}, COMPROJECTHeader.class},

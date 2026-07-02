@@ -93,9 +93,9 @@ return getCheckResults();
 /* COMMENT STATE	    */
 /************************/
 <COMMENT>   	\n             	{
-                                    if(chars>100){
-                                        LOGGER.fine("Setting error line "+(yyline+1)+" because there are more than 100 characters in this line.");
-                                        setError(location,"There are more than 100 characters in this line.", yyline+1);
+                                    if(chars>120){
+                                        LOGGER.fine("Setting error line "+(yyline+1)+" because there are more than 120 characters in this line.");
+                                        setError(location,"There are more than 120 characters in this line.", yyline+1);
                                     }
                                     chars=1;
                                     LOGGER.fine("["+this.parsedFileName+":"+(yyline+1)+":"+yycolumn+"] - COMMENT -> NEW_LINE (Transition : \\n )");
@@ -111,9 +111,9 @@ return getCheckResults();
                                     LOGGER.fine("["+this.parsedFileName+":"+(yyline+1)+":"+yycolumn+"] - NAMING -> COMMENT (Transition : VAR \""+yytext()+"\" )");
                                     yybegin(COMMENT);}
 <NAMING>    	\n             	{
-                                    if(chars>100){
-                                        LOGGER.fine("Setting error line "+(yyline+1)+" because there are more than 100 characters in this line.");
-                                        setError(location,"There are more than 100 characters in this line.", yyline+1);
+                                    if(chars>120){
+                                        LOGGER.fine("Setting error line "+(yyline+1)+" because there are more than 120 characters in this line.");
+                                        setError(location,"There are more than 120 characters in this line.", yyline+1);
                                     }
                                     chars=1;
                                     LOGGER.fine("["+this.parsedFileName+":"+(yyline+1)+":"+yycolumn+"] - NAMING -> NEW_LINE (Transition : \\n )");
@@ -134,9 +134,9 @@ return getCheckResults();
                                     LOGGER.fine("["+this.parsedFileName+":"+(yyline+1)+":"+yycolumn+"] - YYINITIAL -> NAMING (Transition : TYPE \""+yytext()+"\" )");
                                     yybegin(NAMING);}
 <YYINITIAL> 	\n             	{
-                                    if(chars>100){
-                                        LOGGER.fine("Setting error line "+(yyline+1)+" because there are more than 100 characters in this line.");
-                                        setError(location,"There are more than 100 characters in this line.", yyline+1);
+                                    if(chars>120){
+                                        LOGGER.fine("Setting error line "+(yyline+1)+" because there are more than 120 characters in this line.");
+                                        setError(location,"There are more than 120 characters in this line.", yyline+1);
                                     }
                                     chars=1;
                                     LOGGER.fine("["+this.parsedFileName+":"+(yyline+1)+":"+yycolumn+"] - YYINITIAL -> NEW_LINE (Transition : \\n )");
@@ -159,9 +159,9 @@ return getCheckResults();
                                     LOGGER.fine("["+this.parsedFileName+":"+(yyline+1)+":"+yycolumn+"] - NEW_LINE -> NAMING (Transition : TYPE \""+yytext()+"\" )");
                                     yybegin(NAMING);}
 <NEW_LINE>  	\n             	{
-                                    if(chars>100){
-                                        LOGGER.fine("Setting error line "+(yyline+1)+" because there are more than 100 characters in this line.");
-                                        setError(location,"There are more than 100 characters in this line.", yyline+1);
+                                    if(chars>120){
+                                        LOGGER.fine("Setting error line "+(yyline+1)+" because there are more than 120 characters in this line.");
+                                        setError(location,"There are more than 120 characters in this line.", yyline+1);
                                     }
                                     chars=1;
                                 }
@@ -181,9 +181,9 @@ return getCheckResults();
                                     yybegin(NAMING);
                                 }
 <LINE>      	\n             	{
-                                    if(chars>100){
-                                        LOGGER.fine("Setting error line "+(yyline+1)+" because there are more than 100 characters in this line.");
-                                        setError(location,"There are more than 100 characters in this line.", yyline+1);
+                                    if(chars>120){
+                                        LOGGER.fine("Setting error line "+(yyline+1)+" because there are more than 120 characters in this line.");
+                                        setError(location,"There are more than 120 characters in this line.", yyline+1);
                                     }
                                     chars=1;
                                     LOGGER.fine("["+this.parsedFileName+":"+(yyline+1)+":"+yycolumn+"] - LINE -> NEW_LINE (Transition : \\n )");

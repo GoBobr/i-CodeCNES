@@ -85,7 +85,7 @@ VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 /************************/
 /* COMMENT STATE	    */
 /************************/
-<COMMENT>   	\n             	{if(chars>100) setError(location,"There are more than 100 characters in this line.", yyline+1); chars=1; yybegin(NEW_LINE);}  
+<COMMENT>   	\n             	{if(chars>120) setError(location,"There are more than 120 characters in this line.", yyline+1); chars=1; yybegin(NEW_LINE);}  
 <COMMENT>   	.              	{chars+=yytext().length();}
 
 
@@ -93,7 +93,7 @@ VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 /* NAMING STATE	        */
 /************************/
 <NAMING>		{VAR}			{chars+=yytext().length(); location = location + " " + yytext(); yybegin(COMMENT);}
-<NAMING>    	\n             	{if(chars>100) setError(location,"There are more than 100 characters in this line.", yyline+1); chars=1; yybegin(NEW_LINE);}
+<NAMING>    	\n             	{if(chars>120) setError(location,"There are more than 120 characters in this line.", yyline+1); chars=1; yybegin(NEW_LINE);}
 <NAMING>    	.              	{chars+=yytext().length();}
 
 
@@ -102,7 +102,7 @@ VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 /************************/
 <YYINITIAL>  	{COMMENT_WORD} 	{chars+=yytext().length(); yybegin(COMMENT);}
 <YYINITIAL>		{TYPE}        	{chars+=yytext().length(); location = yytext(); yybegin(NAMING);}
-<YYINITIAL> 	\n             	{if(chars>100) setError(location,"There are more than 100 characters in this line.", yyline+1); chars=1; yybegin(NEW_LINE);}
+<YYINITIAL> 	\n             	{if(chars>120) setError(location,"There are more than 120 characters in this line.", yyline+1); chars=1; yybegin(NEW_LINE);}
 <YYINITIAL> 	.              	{chars+=yytext().length(); yybegin(LINE);}
 
 
@@ -111,7 +111,7 @@ VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 /************************/
 <NEW_LINE>  	{COMMENT_WORD} 	{chars+=yytext().length(); yybegin(COMMENT);}
 <NEW_LINE>		{TYPE}        	{chars+=yytext().length(); location = yytext(); yybegin(NAMING);}
-<NEW_LINE>  	\n             	{if(chars>100) setError(location,"There are more than 100 characters in this line.", yyline+1); chars=1; }
+<NEW_LINE>  	\n             	{if(chars>120) setError(location,"There are more than 120 characters in this line.", yyline+1); chars=1; }
 <NEW_LINE>  	.              	{chars+=yytext().length(); yybegin(LINE);}
 
 
@@ -119,7 +119,7 @@ VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 /* LINE STATE    	    */
 /************************/
 <LINE>			{TYPE}        	{chars+=yytext().length(); location = yytext(); yybegin(NAMING);}
-<LINE>      	\n             	{if(chars>100) setError(location,"There are more than 100 characters in this line.", yyline+1); chars=1; yybegin(NEW_LINE);}
+<LINE>      	\n             	{if(chars>120) setError(location,"There are more than 120 characters in this line.", yyline+1); chars=1; yybegin(NEW_LINE);}
 <LINE>      	.              	{chars+=yytext().length();}
 
 

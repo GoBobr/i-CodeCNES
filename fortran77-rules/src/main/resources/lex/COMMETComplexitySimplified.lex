@@ -62,8 +62,8 @@ STRING       = \'[^\']*\' | \"[^\"]*\"
     }
     
     private void checkTotalComplexity() {
-        if(numCyclomatic > 20 ) {
-            setError(location,"The cyclomatic complexity of this function is more than 20: " +numCyclomatic, procedureLine+1); 
+        if(numCyclomatic > 10 ) {
+            setError(location,"The cyclomatic complexity of this function is more than 10: " +numCyclomatic, procedureLine+1); 
         }
     }
     

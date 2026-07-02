@@ -1499,4 +1499,274 @@ module ncdf
        
      end subroutine ncdf_getvar_2D_FourByteInt
 
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
+     subroutine extra_sub_BLOCK(i)
+       integer, intent(in) :: i
+       integer :: j, k
+       j = i * 2
+       k = j + 1
+       if (k > 0) then
+         j = j + k
+       end if
+     end subroutine extra_sub_BLOCK
 end module ncdf
