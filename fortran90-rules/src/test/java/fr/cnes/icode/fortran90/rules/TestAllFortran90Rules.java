@@ -116,7 +116,13 @@ public class TestAllFortran90Rules implements ICodeCheckerTester {
                 {"/EUM/PRES/CommentBlock/error.f90", "/EUM/PRES/CommentBlock/noError.f90", new int[]{3}, new String[]{"program essai"}, EUMPRESCommentBlock.class},
                 {"/EUM/PRES/LabelJustify/error.f90", "/EUM/PRES/LabelJustify/noError.f90", new int[]{3}, new String[]{"program essai"}, EUMPRESLabelJustify.class},
                 {"/EUM/DESIGN/OneUnitPerFile/error.f90", "/EUM/DESIGN/OneUnitPerFile/noError.f90", new int[]{1}, new String[]{"module mymod"}, EUMDESIGNOneUnitPerFile.class},
-                {"/EUM/NAME/FileExt/error.txt", "/EUM/NAME/FileExt/noError.f90", new int[]{1}, new String[]{"MAIN PROGRAM"}, EUMNAMEFileExt.class}
+                {"/EUM/NAME/FileExt/error.txt", "/EUM/NAME/FileExt/noError.f90", new int[]{1}, new String[]{"MAIN PROGRAM"}, EUMNAMEFileExt.class},
+                {"/EUM/MET/MaxContinuation/error.f90", "/EUM/MET/MaxContinuation/noError.f90", new int[]{3}, new String[]{"program essai"}, EUMMETMaxContinuation.class},
+                {"/EUM/MET/MaxProcedures/error.f90", "/EUM/MET/MaxProcedures/noError.f90", new int[]{1}, new String[]{"module mymod"}, EUMMETMaxProcedures.class},
+                {"/EUM/MET/MaxArguments/error.f90", "/EUM/MET/MaxArguments/noError.f90", new int[]{1}, new String[]{"subroutine mysub"}, EUMMETMaxArguments.class},
+                {"/EUM/MET/MaxAttributes/error.f90", "/EUM/MET/MaxAttributes/noError.f90", new int[]{2}, new String[]{"module mymod"}, EUMMETMaxAttributes.class},
+                {"/EUM/FILE/HeaderContent/error.f90", "/EUM/FILE/HeaderContent/noError.f90", new int[]{4}, new String[]{"program essai"}, EUMFILEHeaderContent.class},
+                {"/EUM/PROJECT/HeaderContent/error.f90", "/EUM/PROJECT/HeaderContent/noError.f90", new int[]{3}, new String[]{"subroutine mysub"}, EUMPROJECTHeaderContent.class}
         };
     }
 }

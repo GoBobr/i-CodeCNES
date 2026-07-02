@@ -109,7 +109,13 @@ public class TestAllFortran77Rules implements ICodeCheckerTester {
                 {"/EUM/PRES/CommentBlock/error.f", "/EUM/PRES/CommentBlock/noError.f", new int[]{3}, new String[]{"program essai"}, EUMPRESCommentBlock.class},
                 {"/EUM/PRES/LabelJustify/error.f", "/EUM/PRES/LabelJustify/noError.f", new int[]{3}, new String[]{"program essai"}, EUMPRESLabelJustify.class},
                 {"/EUM/DESIGN/OneUnitPerFile/error.f", "/EUM/DESIGN/OneUnitPerFile/noError.f", new int[]{1}, new String[]{"module mymod"}, EUMDESIGNOneUnitPerFile.class},
-                {"/EUM/NAME/FileExt/error.txt", "/EUM/NAME/FileExt/noError.f", new int[]{1}, new String[]{"MAIN PROGRAM"}, EUMNAMEFileExt.class}
+                {"/EUM/NAME/FileExt/error.txt", "/EUM/NAME/FileExt/noError.f", new int[]{1}, new String[]{"MAIN PROGRAM"}, EUMNAMEFileExt.class},
+                {"/EUM/MET/MaxContinuation/error.f", "/EUM/MET/MaxContinuation/noError.f", new int[]{3}, new String[]{"program essai"}, EUMMETMaxContinuation.class},
+                {"/EUM/MET/MaxProcedures/error.f", "/EUM/MET/MaxProcedures/noError.f", new int[]{1}, new String[]{"module mymod"}, EUMMETMaxProcedures.class},
+                {"/EUM/MET/MaxArguments/error.f", "/EUM/MET/MaxArguments/noError.f", new int[]{1}, new String[]{"subroutine mysub"}, EUMMETMaxArguments.class},
+                {"/EUM/MET/MaxAttributes/error.f", "/EUM/MET/MaxAttributes/noError.f", new int[]{2}, new String[]{"module mymod"}, EUMMETMaxAttributes.class},
+                {"/EUM/FILE/HeaderContent/error.f", "/EUM/FILE/HeaderContent/noError.f", new int[]{4}, new String[]{"program essai"}, EUMFILEHeaderContent.class},
+                {"/EUM/PROJECT/HeaderContent/error.f", "/EUM/PROJECT/HeaderContent/noError.f", new int[]{3}, new String[]{"subroutine mysub"}, EUMPROJECTHeaderContent.class}
         };
     }
 }

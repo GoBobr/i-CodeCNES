@@ -528,4 +528,40 @@
         <name>EUM.NAME.FileExt</name>
         <languageId>fr.cnes.icode.fortran90</languageId>
     </check>
+    <check>
+        <class>fr.cnes.icode.fortran90.rules.EUMMETMaxContinuation</class>
+        <id>fr.cnes.icode.fortran90.rules.EUMMETMaxContinuation</id>
+        <name>EUM.MET.MaxContinuation</name>
+        <languageId>fr.cnes.icode.fortran90</languageId>
+    </check>
+    <check>
+        <class>fr.cnes.icode.fortran90.rules.EUMMETMaxProcedures</class>
+        <id>fr.cnes.icode.fortran90.rules.EUMMETMaxProcedures</id>
+        <name>EUM.MET.MaxProcedures</name>
+        <languageId>fr.cnes.icode.fortran90</languageId>
+    </check>
+    <check>
+        <class>fr.cnes.icode.fortran90.rules.EUMMETMaxArguments</class>
+        <id>fr.cnes.icode.fortran90.rules.EUMMETMaxArguments</id>
+        <name>EUM.MET.MaxArguments</name>
+        <languageId>fr.cnes.icode.fortran90</languageId>
+    </check>
+    <check>
+        <class>fr.cnes.icode.fortran90.rules.EUMMETMaxAttributes</class>
+        <id>fr.cnes.icode.fortran90.rules.EUMMETMaxAttributes</id>
+        <name>EUM.MET.MaxAttributes</name>
+        <languageId>fr.cnes.icode.fortran90</languageId>
+    </check>
+    <check>
+        <class>fr.cnes.icode.fortran90.rules.EUMFILEHeaderContent</class>
+        <id>fr.cnes.icode.fortran90.rules.EUMFILEHeaderContent</id>
+        <name>EUM.FILE.HeaderContent</name>
+        <languageId>fr.cnes.icode.fortran90</languageId>
+    </check>
+    <check>
+        <class>fr.cnes.icode.fortran90.rules.EUMPROJECTHeaderContent</class>
+        <id>fr.cnes.icode.fortran90.rules.EUMPROJECTHeaderContent</id>
+        <name>EUM.PROJECT.HeaderContent</name>
+        <languageId>fr.cnes.icode.fortran90</languageId>
+    </check>
 </checkers>
