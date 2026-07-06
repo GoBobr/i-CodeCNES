@@ -20,6 +20,8 @@ import java.io.FileReader;
 import java.io.File;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +70,9 @@ DIMENSION	 = "dimension"
 DATA		 = "data"
 INTENT		 = "intent" {SPACE}* \( 
 INTENTIN		 = "intent" {SPACE}*\({SPACE}*"in"{SPACE}*\)|"INTENT" {SPACE}*\({SPACE}*"IN"{SPACE}*\)
+INTENTOUT		 = "intent" {SPACE}*\({SPACE}*"out"{SPACE}*\)|"INTENT" {SPACE}*\({SPACE}*"OUT"{SPACE}*\)
+INTENTINOUT		 = "intent" {SPACE}*\({SPACE}*"inout"{SPACE}*\)|"INTENT" {SPACE}*\({SPACE}*"INOUT"{SPACE}*\)
+PARAMETER		 = "parameter"
 READ		 = ([^a-zA-Z0-9\_])?"read"[^a-zA-Z0-9\_\n]
 COMMON		 = ([^a-zA-Z0-9\_])?"common"[^a-zA-Z0-9\_\n]
 NAMELIST	 = ([^a-zA-Z0-9\_])?"namelist"[^a-zA-Z0-9\_\n]
@@ -112,31 +117,76 @@ SEE_FUNC	 = ([^a-zA-Z0-9\_])?("if" | "elseif" | "forall" | "while" | "where" | "
 	//when a call is fire
 	boolean isCall=false;
 	boolean firstCall=false;
-	//when an intent(out) is produce
-	boolean isIntentout=false;
+	//when an intent(in) is declared (variable is initialized by caller)
+	boolean isIntentIn=false;
+	//when an intent(out) is declared (variable is assigned by subroutine)
+	boolean isIntentOut=false;
 	//name of sunroutine
 	String nameType="";
 	
+	// Fortran attribute keywords that should not be treated as variables
+	Set<String> fortranKeywords = new HashSet<String>(Arrays.asList(
+		"allocatable", "pointer", "public", "private", "optional", "parameter",
+		"dimension", "intent", "save", "target", "external", "intrinsic",
+		"allocated", "associated", "volatile", "asynchronous", "bind",
+		"protected", "value", "contiguous", "sequence", "abstract",
+		"extends", "import", "non_overridable", "deferred", "final",
+		"generic", "procedure", "operator", "assignment", "read", "write",
+		"pass", "nopass", "entry", "result", "recursive", "pure", "elemental",
+		"module", "submodule", "block", "data", "namelist", "common",
+		"equivalence", "implicit", "none", "use", "only", "include",
+		"interface", "end", "enddo", "endif", "endtype", "endmodule",
+		"endsubroutine", "endfunction", "endprogram", "endinterface",
+		"contains", "return", "call", "continue", "goto", "go", "to",
+		"pause", "stop", "cycle", "exit", "allocate", "deallocate",
+		"nullify", "inquire", "rewind", "backspace", "endfile", "flush",
+		"wait", "lock", "unlock", "sync", "critical", "block",
+		"associate", "endassociate", "change", "endteam", "form",
+		"event", "endevent", "coarray"
+	));
+	// Fortran intrinsic functions that should not be treated as variables
+	Set<String> fortranIntrinsics = new HashSet<String>(Arrays.asList(
+		"size", "lbound", "ubound", "len", "len_trim", "kind", "shape",
+		"allocated", "associated", "present", "abs", "min", "max",
+		"mod", "modulo", "sign", "dim", "dprod", "floor", "ceiling",
+		"nint", "int", "real", "dble", "cmplx", "aimag", "conjg",
+		"sqrt", "exp", "log", "log10", "sin", "cos", "tan",
+		"asin", "acos", "atan", "atan2", "sinh", "cosh", "tanh",
+		"minval", "maxval", "minloc", "maxloc", "sum", "product",
+		"count", "any", "all", "merge", "pack", "unpack", "reshape",
+		"spread", "cshift", "eoshift", "transpose", "matmul",
+		"dot_product", "trim", "adjustl", "adjustr", "scan",
+		"verify", "index", "repeat", "char", "achar", "ichar",
+		"iachar", "string", "transfer", "leadz", "trailz", "popcnt",
+		"poppar", "maskl", "maskr", "shiftl", "shiftr", "shifta",
+		"merge_bits", "iand", "ior", "ieor", "not", "ibclr", "ibset",
+		"btest", "ishft", "ishftc", "mvbits", "dshiftl", "dshiftr",
+		"selected_int_kind", "selected_real_kind", "selected_char_kind",
+		"epsilon", "tiny", "huge", "precision", "range", "radix",
+		"digits", "minexponent", "maxexponent", "exponent", "fraction",
+		"scale", "set_exponent", "nearest", "spacing", "rrspacing",
+		"norm2", "hypot", "bessel_j0", "bessel_j1", "bessel_jn",
+		"bessel_y0", "bessel_yn", "erf", "erfc", "erfc_scaled",
+		"gamma", "log_gamma", "command_argument_count",
+		"get_command", "get_command_argument", "get_environment_variable",
+		"system_clock", "date_and_time", "random_number", "random_seed",
+		"execute_command_line", "move_alloc", "new_line",
+		"omp_get_thread_num", "omp_get_num_threads", "omp_get_max_threads",
+		"omp_in_parallel", "omp_get_level", "omp_get_ancestor_thread_num"
+	));
 
     public COMDATAInitialisation() {
     }
-	
-	@Override
-	public void setInputFile(final File file) throws FileNotFoundException {
-		super.setInputFile(file);
-		
-		this.parsedFileName = file.toString();
+
+        @Override
+        public void setInputFile(final File file) throws FileNotFoundException {
+                super.setInputFile(file);
+
+                this.parsedFileName = file.toString();
         this.zzReader = new FileReader(new File(file.getAbsolutePath()));
-	}
-	
-	//Mantis 316 EGL : detect initialized by local fonction
+        }
+
 	/**
-	 * This function add Naming subroutin, function, module in List  
-	 * in order to analyse at the end of parsing if 
-	 * this variable is initialized by this naming which called in source code.
-	 * this function is call when a call of naming is done.
-	 * @param funct
-	 * @param paramVar
 	 * @param position
 	 */
 	private void addVariableByCallType(final String funct, final String paramVar,final String location,final int line){
@@ -436,19 +486,19 @@ return getCheckResults();
 <INIT>			{COMMENT_LINE}		{}
 <INIT>			{STRING}			{}
 <INIT>		  	{VAR} 				{variable = yytext(); fin=true;
-									 if (isIntentout){
-									 	setErrorVariableByType(nameType, variable);		
-									 							 
-									 }	
-								 	 if(!variables.containsKey(variable)) variables.put(variable, false);
+									 if (isIntentIn){
+									 	variables.put(variable, true);
+									 	setErrorVariableByType(nameType, variable);
+									 } else if(!variables.containsKey(variable)) variables.put(variable, false);
 								 	 if(dim) dimension.add(variable);}
 <INIT>			{EQUAL}				{variables.put(variable, true ); yybegin(WAIT);}
 <INIT>			{NUM}				{fin=true;}
 <INIT>			\(					{par=1; yybegin(WAIT_ARRAY);}
 <INIT>			{SPACE}				{}
+<INIT>			\&{SPACE}*\n		{}
 <INIT>			\n[\ ]{1,5}{SIMBOL}	{}
-<INIT>			\n					{dim=false; if(fin)yybegin(NEW_LINE);}
-<INIT>			.					{isIntentout=false;fin=true;}
+<INIT>			\n					{dim=false; isIntentIn=false; isIntentOut=false; if(fin)yybegin(NEW_LINE);}
+<INIT>			.					{fin=true;}
 
 /************************/
 /* DECLARATION STATE    */
@@ -456,15 +506,21 @@ return getCheckResults();
 <DECLARATION>	{TYPE}				{location = yytext(); yybegin(NAMING);}
 <DECLARATION>	{STRING}	        {}
 <DECLARATION>	{DIMENSION}		    {dim=true;}
-<DECLARATION>	{INTENTIN}		    {dim=false; isIntentout=true;}
+<DECLARATION>	{INTENTIN}		    {dim=false; isIntentIn=true;}
+<DECLARATION>	{INTENTOUT}		    {dim=false; isIntentOut=true;}
+<DECLARATION>	{INTENTINOUT}	    {dim=false; isIntentIn=true;}
 <DECLARATION>	{INTENT}		    {dim=false; yybegin(COMMENT);}
 <DECLARATION>	\:\:			    {yybegin(INIT);}
 <DECLARATION>	{VAR}[\ ]* \(		{variable = yytext().substring(0, yytext().length()-1).trim();  
-									 if(!variables.containsKey(variable))variables.put(variable, false); 
-									 dimension.add(variable);}
-<DECLARATION>	{VAR}				{if(!variables.containsKey(yytext())) variables.put(yytext(), false);}
+										 String v = variable.toLowerCase();
+										 if(!fortranKeywords.contains(v) && !fortranIntrinsics.contains(v)) {
+										     if(!variables.containsKey(variable))variables.put(variable, false); 
+										     dimension.add(variable);
+										 }}
+<DECLARATION>	{VAR}				{String v = yytext().toLowerCase(); if(!fortranKeywords.contains(v) && !fortranIntrinsics.contains(v)) {if(!variables.containsKey(yytext())) variables.put(yytext(), false);}}
 <DECLARATION>	{EQUAL}				{variables.put(variable, true ); yybegin(WAIT);}
 <DECLARATION>	{NUM}				{}
+<DECLARATION>	\&{SPACE}*\n		{}
 <DECLARATION>	\n[\ ]{1,5}{SIMBOL}	{}
 <DECLARATION>  	\n             		{yybegin(NEW_LINE);}
 <DECLARATION>  	.              		{}
@@ -474,6 +530,7 @@ return getCheckResults();
 /************************/
 <WAIT>			{COMMENT_LINE}	{}
 <WAIT>			{STRING}		{}
+<WAIT>			\&{SPACE}*\n	{}
 <WAIT>			\,				{yybegin(DECLARATION);}
 <WAIT>			\n				{yybegin(NEW_LINE);}
 <WAIT>			.				{}
@@ -505,6 +562,7 @@ return getCheckResults();
 										; fin=true;
 									}
 <DATA>			{SPACE}				{}
+<DATA>			\&{SPACE}*\n		{}
 <DATA>			\n[\ ]{1,5}{SIMBOL}	{}
 <DATA>   		\n             		{isCall=false;yybegin(NEW_LINE);}  
 <DATA>			.					{}
@@ -540,6 +598,7 @@ return getCheckResults();
 <VAR_EQ>	    {SEE_FUNC}		{}
 <VAR_EQ>		{VAR_PAR}		{String var = yytext().substring(0,yytext().length()-1).trim();
 								 if (!dimension.contains(var)) { par = 1; yybegin(FUNC);}  }
+<VAR_EQ>		{VAR}{SPACE}*\=		{String v = yytext().replaceAll("[\\s=]", ""); variables.put(v, true); initialized = true;}
 <VAR_EQ>		{VAR}			{variable = yytext(); initialized = false;}
 <VAR_EQ>		{EQUAL} 		{initialized = true;
 								 variables.put(variable, true ); }
