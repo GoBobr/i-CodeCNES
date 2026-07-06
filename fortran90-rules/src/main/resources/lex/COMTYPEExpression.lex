@@ -82,6 +82,8 @@ RELAT		 = \.LT\.	  | \.LE\.	   | \.EQ\.			| \.NE\.	|
 OPERATOR     = {LOGIC}    | {RELAT} 
 STRUCT		 = {VAR} (\([^\)]*\))? \%
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
+NUM			 = [0-9]+\.([0-9]*([eE][\-\+]?[0-9]+)?)?([_]{VAR})?
+INT_NUM		 = [0-9]+([_]{VAR})?
 STRING		 = \'[^\']*\' | \"[^\"]*\"
 																
 %{
@@ -118,14 +120,17 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 		String key = variables.get(var);
 		if (key != null) {
 			if(exception && expression) {
-				if(!key.equals("integer") && !expressionType.equals(key) && !expressionType.equals("empty"))
+				if(!key.equals("integer") && !expressionType.equals(key) && !expressionType.equals("empty")
+				   && !(expressionType.equals("integer") && (key.equals("REAL") || key.equals("DOUBLE PRECISION"))))
 					error = true;
 				exception = false;
 			}
 			else  {
 				if (expressionType.equals("empty")) 
 					expressionType = key;
-				else if (!expressionType.equals(key)) 
+				else if (!expressionType.equals(key)
+						 && !(expressionType.equals("integer") && (key.equals("REAL") || key.equals("DOUBLE PRECISION")))
+						 && !(key.equals("integer") && (expressionType.equals("REAL") || expressionType.equals("DOUBLE PRECISION")))) 
 					error = true;
 			}
 			
@@ -188,7 +193,9 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <NEW_LINE>		{DIMENSION}		{yybegin(DIMENSION);}
 <NEW_LINE>		{DATA_TYPE}		{type=yytext().toUpperCase(); yybegin(DECL_PARAMS);}
 <NEW_LINE>		{CONVERSION}	{par++; conv=yytext().toLowerCase(); yybegin(CONV_FUNC);}
-<NEW_LINE>		{IF}			{yybegin(IF_STATE);}
+<NEW_LINE>		{IF}			{yybegin(IF_STATE);}<NEW_LINE>		{STRUCT}			{expressionType="empty"; expression=false; exception=false; error=false;}
+<NEW_LINE>		{NUM}			{if(expressionType.equals("empty")) expressionType="REAL"; expression=true;}
+<NEW_LINE>		{INT_NUM}			{if(expressionType.equals("empty")) expressionType="INTEGER"; expression=true;}
 <NEW_LINE>		{VAR}			{if(!isArray) { checkExpression(yytext()); }}
 <NEW_LINE>		{VAR}[\ ]*\(	{String v = yytext().substring(0, yytext().length()-1).trim(); 
 								 if(variables.get(v) != null) {par=1; checkExpression(v); yybegin(AVOID);} }
@@ -211,7 +218,9 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <LINE>			{DIMENSION}		{yybegin(DIMENSION);}
 <LINE>			{DATA_TYPE}		{type=yytext().toUpperCase(); yybegin(DECL_PARAMS);}
 <LINE>			{CONVERSION}	{par++; conv=yytext().toLowerCase(); yybegin(CONV_FUNC); end=true;}
-<LINE>			{IF}			{yybegin(IF_STATE);}
+<LINE>			{IF}				{yybegin(IF_STATE);}
+<LINE>			{NUM}			{if(expressionType.equals("empty")) expressionType="REAL"; expression=true; end=true;}
+<LINE>			{INT_NUM}			{if(expressionType.equals("empty")) expressionType="INTEGER"; expression=true; end=true;}
 <LINE>			{VAR}			{if(!isArray) { checkExpression(yytext()); } end=true;}
 <LINE>			{VAR}[\ ]*\(	{String v = yytext().substring(0, yytext().length()-1).trim(); 
 								 if(variables.get(v) != null) {par=1; checkExpression(v); yybegin(AVOID);} }
@@ -321,6 +330,9 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 /* IF_STATE STATE   	*/
 /************************/
 <IF_STATE>		{STRING}		{}
+<IF_STATE>		{STRUCT}			{expressionType="empty"; expression=false; exception=false; error=false;}
+<IF_STATE>		{NUM}			{if(expressionType.equals("empty")) expressionType="REAL"; expression=true;}
+<IF_STATE>		{INT_NUM}			{if(expressionType.equals("empty")) expressionType="INTEGER"; expression=true;}
 <IF_STATE>		{VAR}			{if(!isArray) { checkExpression(yytext()); } end=true;}
 <IF_STATE>		{OP_EXEP}		{exception=true; expression = true;}
 <IF_STATE>		{EXP}			{expression = true;}
