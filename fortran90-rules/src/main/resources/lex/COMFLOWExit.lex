@@ -145,7 +145,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 							 	 }
 								 if(ifBlockDepth > 0) {
 									/* RETURN inside IF...THEN block -- don't count as extra exit */
-								 } else if(!lineHasIf || !lineHasCompare){
+								 } else if(!lineHasIf){
 								 if(returnExist){
 								 	setError(loc.get(loc.size()-1),"There is more than one exit in the function.", yyline+1);
 								 }else{
@@ -184,7 +184,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 							 	 }
 								 if(ifBlockDepth > 0) { 
 									/* RETURN inside IF...THEN block -- don't count as extra exit */
-								 } else if(!lineHasIf || !lineHasCompare){ 
+								 } else if(!lineHasIf){ 
 								 if(returnExist){ 
 								 	setError(loc.get(loc.size()-1),"There is more than one exit in the function.", yyline+1);
 								 }else{ 

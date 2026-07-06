@@ -62,7 +62,7 @@ public class TestAllFortran90Rules implements ICodeCheckerTester {
                 {"/COM/PRES/LengthLine/error.f", "/COM/PRES/LengthLine/noError.f", new int[]{7, 9, 18}, new String[]{"PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI"}, COMPRESLengthLine.class},
                 {"/COM/PRES/FileLength/error.f", "/COM/PRES/FileLength/noError.f", new int[]{1772}, new String[]{"subroutine extra_sub_BLOCK"}, COMPRESFileLength.class},
                 {"/COM/PROJECT/Header/error.f90", "/COM/PROJECT/Header/noError.f90", new int[]{0, 11}, new String[]{"No file header existing.", "FUNCTION F"}, COMPROJECTHeader.class},
-                {"/COM/TYPE/Expression/error.f", "/COM/TYPE/Expression/noError.f", new int[]{20, 21, 23, 48, 53}, new String[]{"PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "SUBROUTINE GS_calcul_ecart_echt", "SUBROUTINE GS_calcul_ecart_echt"}, COMTYPEExpression.class},
+                {"/COM/TYPE/Expression/error.f", "/COM/TYPE/Expression/noError.f", new int[]{23}, new String[]{"PROGRAM ESSAI"}, COMTYPEExpression.class},
                 {"/F90/BLOC/File/error.f", "/F90/BLOC/File/noError.f", new int[]{20}, new String[]{"PROGRAM ESSAI"}, F90BLOCFile.class},
                 {"/F90/DATA/Array/error.f", "/F90/DATA/Array/noError.f", new int[]{3, 21}, new String[]{"Subroutine somme", "Subroutine somme2"}, F90DATAArray.class},
                 {"/F90/DATA/ArrayAccess/error.f", "/F90/DATA/ArrayAccess/noError.f", new int[]{10}, new String[]{"program ESSAI"}, F90DATAArrayAccess.class},

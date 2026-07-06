@@ -40,7 +40,7 @@ import fr.cnes.icode.exception.JFlexException;
 %type List<CheckResult>
 
 
-%state COMMENT, NAMING, NEW_LINE, LINE, DECL_PARAMS, DECLARATION, AVOID, CONV_FUNC, REAL, DIMENSION, IF_STATE, AVOIDI, IO
+%state COMMENT, NAMING, NEW_LINE, LINE, DECL_PARAMS, DECLARATION, AVOID, CONV_FUNC, REAL, DIMENSION, IF_STATE, AVOIDI, IO, USE_STATE
 
 COMMENT_WORD = \!         | c          | C     | \*
 FREE_COMMENT = \!
@@ -121,23 +121,27 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 	private void checkExpression(String var) throws JFlexException {
 		String key = variables.get(var);
 		if (key != null) {
-			key = key.replaceAll("\\s+", " ").trim();
-			String et = expressionType.replaceAll("\\s+", " ").trim();
-			if(exception && expression) {
-				if(!key.equals("integer") && !et.equals(key) && !et.equals("empty")
-				   && !(et.equals("integer") && (key.equals("REAL") || key.equals("DOUBLE PRECISION"))))
+			key = key.replaceAll("\\s+", " ").trim().toUpperCase();
+			String et = expressionType.replaceAll("\\s+", " ").trim().toUpperCase();
+			if(key.equals("UNKNOWN")) {
+				/* Variable from USE without type info — can't check */
+			}
+			else if(exception && expression) {
+				if(!key.equals("INTEGER") && !et.equals(key) && !et.equals("EMPTY")
+				   && !(et.equals("INTEGER") && (key.equals("REAL") || key.equals("DOUBLE PRECISION")))
+				   && !(key.equals("INTEGER") && (et.equals("REAL") || et.equals("DOUBLE PRECISION"))))
 					error = true;
 				exception = false;
 			}
 			else  {
-				if (et.equals("empty")) 
+				if (et.equals("EMPTY"))
 					expressionType = key;
 				else if (!et.equals(key)
-						 && !(et.equals("integer") && (key.equals("REAL") || key.equals("DOUBLE PRECISION")))
-						 && !(key.equals("integer") && (et.equals("REAL") || et.equals("DOUBLE PRECISION")))) 
+						 && !(et.equals("INTEGER") && (key.equals("REAL") || key.equals("DOUBLE PRECISION")))
+						 && !(key.equals("INTEGER") && (et.equals("REAL") || et.equals("DOUBLE PRECISION"))))
 					error = true;
 			}
-			
+
 			if (expression && error && !errorThrown && !errors.contains(yyline)) {
 				errorThrown = true;
 				setError(location,"Mixed type " + expressionType + " with " + key, yyline+1);
@@ -197,10 +201,12 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <NEW_LINE>		{DIMENSION}		{yybegin(DIMENSION);}
 <NEW_LINE>		{DATA_TYPE}		{type=yytext().toUpperCase(); yybegin(DECL_PARAMS);}
 <NEW_LINE>		{CONVERSION}	{par++; conv=yytext().toLowerCase(); yybegin(CONV_FUNC);}
-<NEW_LINE>		{IF}			{yybegin(IF_STATE);}<NEW_LINE>		{STRUCT}			{expressionType="empty"; expression=false; exception=false; error=false;}
+<NEW_LINE>		{IF}			{yybegin(IF_STATE);}
+<NEW_LINE>		"use"			{yybegin(USE_STATE);}
 <NEW_LINE>		{DNUM}			{if(expressionType.equals("empty")) expressionType="DOUBLE PRECISION"; expression=true;}
 <NEW_LINE>		{NUM}			{if(expressionType.equals("empty")) expressionType="REAL"; expression=true;}
 <NEW_LINE>		{INT_NUM}			{if(expressionType.equals("empty")) expressionType="INTEGER"; expression=true;}
+<NEW_LINE>		{STRUCT}			{expressionType="empty"; expression=false; exception=false; error=false;}
 <NEW_LINE>		{VAR}			{if(!isArray) { checkExpression(yytext()); }}
 <NEW_LINE>		{VAR}[\ ]*\(	{String v = yytext().substring(0, yytext().length()-1).trim(); 
 								 if(variables.get(v) != null) {par=1; checkExpression(v); yybegin(AVOID);} }
@@ -225,6 +231,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <LINE>			{DATA_TYPE}		{type=yytext().toUpperCase(); yybegin(DECL_PARAMS);}
 <LINE>			{CONVERSION}	{par++; conv=yytext().toLowerCase(); yybegin(CONV_FUNC); end=true;}
 <LINE>			{IF}				{yybegin(IF_STATE);}
+<LINE>			"use"			{yybegin(USE_STATE);}
 <LINE>			{DNUM}			{if(expressionType.equals("empty")) expressionType="DOUBLE PRECISION"; expression=true; end=true;}
 <LINE>			{NUM}			{if(expressionType.equals("empty")) expressionType="REAL"; expression=true; end=true;}
 <LINE>			{INT_NUM}			{if(expressionType.equals("empty")) expressionType="INTEGER"; expression=true; end=true;}
@@ -322,7 +329,10 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 									else et = "INTEGER";
 									if(expression) {
 										if(expressionType.equals("empty")) expressionType = et;
-										else if(!et.equals(expressionType) && !errors.contains(yyline)) {
+										else if(!et.equals(expressionType)
+												&& !(et.equals("INTEGER") && (expressionType.equals("REAL") || expressionType.equals("DOUBLE PRECISION")))
+												&& !(expressionType.equals("INTEGER") && (et.equals("REAL") || et.equals("DOUBLE PRECISION")))
+												&& !errors.contains(yyline)) {
 											setError(location,"Mixed type " + expressionType + " with " + et, yyline+1);
 											errors.add(yyline);
 										}
@@ -352,6 +362,18 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 								 if(par==0){expressionType="empty"; expression = false; exception = false; error = false; isArray = false; yybegin(LINE);}}
 <IF_STATE>     	\n             	{}
 <IF_STATE>     	.              	{}
+
+
+/************************/
+/* USE_STATE    	    */
+/************************/
+<USE_STATE>		\![^\n]*		{}
+<USE_STATE>		{STRING}		{}
+<USE_STATE>		"only"[\ \t]*":"	{}
+<USE_STATE>		{VAR}			{variables.put(yytext(), "UNKNOWN");}
+<USE_STATE>		\&[\ \t]*\n	{}
+<USE_STATE>		\n				{yybegin(NEW_LINE);}
+<USE_STATE>		.				{}
 
 
 /************************/

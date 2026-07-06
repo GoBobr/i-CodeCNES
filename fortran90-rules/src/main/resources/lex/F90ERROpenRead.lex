@@ -64,7 +64,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 OPEN		 = "open"{SPACE}*\(
 READ		 = "read"{SPACE}*\(
 IF_IOS		 = "if" {SPACE}* \( {SPACE}* {VAR}
-IOSTAT 		 = ("iostat") {SPACE}* \= {SPACE}* {VAR}
+IOSTAT 		 = "iostat" {SPACE}* \= {SPACE}* {VAR}
 
 /* Variable "location" is used to determine rule's error location (function,	*/
 /* procedure, etc.).															*/
@@ -149,7 +149,7 @@ IOSTAT 		 = ("iostat") {SPACE}* \= {SPACE}* {VAR}
 			{STRING} | "unit"	{}
 			"file"				{file=true;}
 			{IOSTAT}			{iostat = true;
-								 iostatVal = yytext().replace(" ","").split("=")[1];}
+							 iostatVal = yytext().replace(" ","").split("=")[1].toLowerCase();}
 			{VAR} | \*			{if(!add) {files.add(yytext()); add=true;} }
 			&{SPACE}*[^\n\r]	{}
 			&					{multLines = true;}
@@ -183,7 +183,7 @@ IOSTAT 		 = ("iostat") {SPACE}* \= {SPACE}* {VAR}
 			{LINE_COMMENT}   	{}
 			{STRING} | "unit"	{}
 			{IOSTAT}			{iostat = true;
-								 iostatVal = yytext().replace(" ","").split("=")[1];}
+							 iostatVal = yytext().replace(" ","").split("=")[1].toLowerCase();}
 			{VAR}				{if(!add) {     // if the first value read and existing file opened -> verify iostat
 								 	if (!files.contains(yytext())) {
 								 		add=true; // not a file unit — keep scanning for IOSTAT
@@ -212,14 +212,14 @@ IOSTAT 		 = ("iostat") {SPACE}* \= {SPACE}* {VAR}
 		{
 			{LINE_COMMENT}		{}
 			"end"{SPACE}*"if"	{}
-			{IF_IOS}			{String checkedVal = yytext().replace(" ","").split("\\(")[1];
+			{IF_IOS}			{String checkedVal = yytext().replace(" ","").split("\\(")[1].toLowerCase();
 								 if (!checkedVal.equals(iostatVal)) this.setError(location,"The return of IOSTAT is no checked in the " + descr + " instruction.", errorLine); 
 								 yybegin(YYINITIAL);}
 			{OPEN}				{this.setError(location,"The return of IOSTAT is no checked in the " + descr + " instruction.", errorLine);
 								 errorLine = yyline + 1; descr = yytext().toUpperCase().replaceAll("\\(", "").trim(); iostat=false; file=false; add=false; yybegin(OPEN);}
 			{READ}				{this.setError(location,"The return of IOSTAT is no checked in the " + descr + " instruction.", errorLine);
 								 errorLine = yyline + 1; descr = yytext().toUpperCase().replaceAll("\\(", "").trim(); iostat=false; add=false; yybegin(READ);}
-			{VAR}				{if(yytext().equals(iostatVal)) {yybegin(YYINITIAL);}}
+			{VAR}				{if(yytext().toLowerCase().equals(iostatVal)) {yybegin(YYINITIAL);}}
 			&{SPACE}*[^\n\r]	{}
 			\n|\r				{}
 			.					{}

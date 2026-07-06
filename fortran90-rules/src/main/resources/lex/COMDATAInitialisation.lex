@@ -510,6 +510,8 @@ return getCheckResults();
 									 if (isIntentIn || isParameter){
 									 	variables.put(variable, true);
 									 	setErrorVariableByType(nameType, variable);
+									 } else if(isIntentOut){
+									 	variables.put(variable, true);
 									 } else if(!variables.containsKey(variable)) variables.put(variable, false);
 								 	 if(dim) dimension.add(variable);}
 <INIT>			{EQUAL}				{variables.put(variable, true ); yybegin(WAIT);}

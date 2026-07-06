@@ -45,7 +45,7 @@ import fr.cnes.icode.data.CheckResult;
 /*	 - COMPARE, to deal with strict comparison. */
 /*	 - BRACE, to deal with parenthesis.			*/
 /*   - DECLARATION, to save all the variables that cause no error */
-%state COMMENT, NAMING, INIT, COMPARE, BRACE, WAIT, DECLARATION, DECL_PARAM
+%state COMMENT, NAMING, INIT, COMPARE, BRACE, WAIT, DECLARATION, DECL_PARAM, USE_STATE
 
 COMMENT_LINE = \! [^\n]*
 TYPE		 = "function"  | "procedure" | "subroutine"  | "program" | "module" |"interface"
@@ -55,7 +55,7 @@ SPACE        = [\ \t\f]
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 STRING		 = \'[^\']*\' | \"[^\"]*\"
 LOGIC_OP	 = "\.and\."|"\.or\."|"\.not\."|"\.eqv\."|"\.neqv\."|"\.AND\."|"\.OR\."|"\.NOT\."|"\.EQV\."|"\.NEQV\."
-STRUCT		 = {VAR}\%
+STRUCT		 = {VAR}(\%{VAR})+
 NUM_LITERAL = [0-9]+\.?[0-9]*[dDeE][\-\+]?[0-9]+([_][a-zA-Z0-9_]+)? | \.[0-9]+[dDeE][\-\+]?[0-9]+([_][a-zA-Z0-9_]+)?
 
 /* Two lists are created. The first one contains all declared variables. The second	*/
@@ -377,6 +377,8 @@ DATA_TYPE	 = ("integer" | "logical" | "character" ) ( {SPACE} | {SPACE}*"(" | {S
 							 yybegin(BRACE);}
 			/* This is used to look for variable declaration */
 			{RULE_WORD}		{yybegin(INIT);}
+			/* USE statement — track USE-associated variables */
+			"use"			{yybegin(USE_STATE);}
 			/* If a variable is in wrong type, we set a potential error */
 			{VAR}			{if (allVariables.contains(yytext().toLowerCase())){
 								currentVariable = yytext().toLowerCase();
@@ -395,6 +397,17 @@ DATA_TYPE	 = ("integer" | "logical" | "character" ) ( {SPACE} | {SPACE}*"(" | {S
 			\n|\r		  	{firstFloat = false; currentVariable="";}
 			.              	{firstFloat = false;}
 		}
+
+/************************/
+/* USE_STATE    	    */
+/************************/
+<USE_STATE>		{COMMENT_LINE}	{}
+<USE_STATE>		"only"[\ \t]*":"	{}
+<USE_STATE>		{VAR}			{allVariablesNoError.add(yytext().toLowerCase());}
+<USE_STATE>		\&[\ \t]*\n		{}
+<USE_STATE>		\n|\r			{yybegin(YYINITIAL);}
+<USE_STATE>		.				{}
+
 
 /*********************/
 /*	ERROR THROWN	 */

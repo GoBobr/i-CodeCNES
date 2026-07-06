@@ -44,7 +44,7 @@ import fr.cnes.icode.data.CheckResult;
 /* A state called INDEX is to determine whenever the equal sign is passed.	*/
 /* A state called INIT is set to get all declared variables that are not an */
 /* integer.																	*/
-%state COMMENT, NAMING, NEW_LINE, LINE, ENTER_DO, INDEX, INIT, PAR, PARI
+%state COMMENT, NAMING, NEW_LINE, LINE, ENTER_DO, INDEX, INIT, PAR, PARI, USE_STATE
 
 COMMENT_WORD = \!         | c          | C     | \*
 FREE_COMMENT = \!
@@ -57,7 +57,7 @@ TYPE		 = {FUNC}     | {PROC}	   | {SUB} | {PROG} | {MOD}
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 STRING		 = \'[^\']*\' | \"[^\"]*\"
 SPACE		 = [\ \t\r]
-STRUCT		 = {VAR}\%
+STRUCT		 = {VAR}(\%{VAR})+
 KEYWORD	 = "dimension"|"DIMENSION"|"allocatable"|"ALLOCATABLE"|"pointer"|"POINTER"|"intent"|"INTENT"|"save"|"SAVE"|"target"|"TARGET"|"external"|"EXTERNAL"|"intrinsic"|"INTRINSIC"|"optional"|"OPTIONAL"|"parameter"|"PARAMETER"|"public"|"PUBLIC"|"private"|"PRIVATE"|"volatile"|"VOLATILE"|"asynchronous"|"ASYNCHRONOUS"|"protected"|"PROTECTED"|"value"|"VALUE"|"contiguous"|"CONTIGUOUS"
 
 %{
@@ -220,6 +220,7 @@ INTRIN_INT  = "size" | "SIZE" | "lbound" | "LBOUND" | "ubound" | "UBOUND" | "len
 								 yybegin(NAMING);}
 <NEW_LINE>		{WRONG_TYPE}	{yybegin(INIT);}
 <NEW_LINE>		{RULE_WORD}		{yybegin(ENTER_DO);}
+<NEW_LINE>		"use"			{yybegin(USE_STATE);}
 <NEW_LINE>		{END}			{yybegin(COMMENT);}
 <NEW_LINE>		{VAR}			{}
 <NEW_LINE>		{SPACE}			{}
@@ -233,10 +234,22 @@ INTRIN_INT  = "size" | "SIZE" | "lbound" | "LBOUND" | "ubound" | "UBOUND" | "len
 <LINE>		  	{TYPE}         	{location = yytext();
 								 yybegin(NAMING);}
 <LINE>			{RULE_WORD}		{yybegin(ENTER_DO);}
+<LINE>			"use"			{yybegin(USE_STATE);}
 <LINE>			{END}			{yybegin(COMMENT);}
 <LINE>			{VAR}			{}
 <LINE>      	\n             	{yybegin(NEW_LINE);}
 <LINE>			.				{}
+
+/************************/
+/* USE_STATE    	    */
+/************************/
+<USE_STATE>		\![^\n]*		{}
+<USE_STATE>		"only"[\ \t]*":"	{}
+<USE_STATE>		{VAR}			{wrongTypeVariables.remove(yytext());}
+<USE_STATE>		\&[\ \t]*\n		{}
+<USE_STATE>		\n				{yybegin(NEW_LINE);}
+<USE_STATE>		.				{}
+
 
 /*********************/
 /*	ERROR THROWN	 */

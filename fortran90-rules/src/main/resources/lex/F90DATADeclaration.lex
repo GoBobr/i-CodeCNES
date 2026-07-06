@@ -217,7 +217,7 @@ PREPROC     = \#[^\n]*
 		{
 			{COMMENT_LINE}				{}
 			{PREPROC}					{}
-			"use"						{yybegin(WAIT);}
+			"use"						{hasOnly = false; yybegin(USE_STATE);}
 			"implicit"{SPACE}*"none"	{yybegin(NEW_LINE);}
 			{CLE}						{}
 			{LOGIC_OP}					{}
