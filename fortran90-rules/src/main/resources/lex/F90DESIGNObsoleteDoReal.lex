@@ -57,6 +57,8 @@ TYPE		 = {FUNC}     | {PROC}	   | {SUB} | {PROG} | {MOD}
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 STRING		 = \'[^\']*\' | \"[^\"]*\"
 SPACE		 = [\ \t\r]
+STRUCT		 = {VAR}\%
+KEYWORD	 = "dimension"|"DIMENSION"|"allocatable"|"ALLOCATABLE"|"pointer"|"POINTER"|"intent"|"INTENT"|"save"|"SAVE"|"target"|"TARGET"|"external"|"EXTERNAL"|"intrinsic"|"INTRINSIC"|"optional"|"OPTIONAL"|"parameter"|"PARAMETER"|"public"|"PUBLIC"|"private"|"PRIVATE"|"volatile"|"VOLATILE"|"asynchronous"|"ASYNCHRONOUS"|"protected"|"PROTECTED"|"value"|"VALUE"|"contiguous"|"CONTIGUOUS"
 
 %{
 	String location = "MAIN PROGRAM";
@@ -129,7 +131,9 @@ WRONG_TYPE  = {REAL} 			| {DOUBLE_PREC} | {COMPLEX} | {LOGICAL} | {CHAR}
 /*****************************/
 /* Whenever a type declaration is found, we check that only one variable is on the */
 /* line, which there is no comma (,).											   */ 
+<INIT> 			{KEYWORD}		{}
 <INIT> 			{VAR}			{wrongTypeVariables.add(yytext());}
+<INIT>			\&{SPACE}*\n		{}
 <INIT>			\(				{par=1; yybegin(PARI);}
 <INIT>			.				{}
 <INIT>			\n				{LAST_STATE = INIT;
@@ -145,6 +149,7 @@ WRONG_TYPE  = {REAL} 			| {DOUBLE_PREC} | {COMPLEX} | {LOGICAL} | {CHAR}
 /*****************************/
 /* If an equal sign appears, we go straight to INDEX part. */
 <ENTER_DO>		{WHILE}			{yybegin(COMMENT);}
+<ENTER_DO>		{STRUCT}			{}
 <ENTER_DO>		{VAR}			{if (wrongTypeVariables.contains(yytext())) { violation = true; variable = variable + " " + yytext(); }}
 <ENTER_DO>		\=				{yybegin(INDEX);}
 <ENTER_DO>		.				{}
@@ -155,6 +160,7 @@ WRONG_TYPE  = {REAL} 			| {DOUBLE_PREC} | {COMPLEX} | {LOGICAL} | {CHAR}
 /*****************************/
 /* We do nothing for integer, blank and end of line. Otherwise, an error is set. */
 <INDEX>			[0-9]+			{}
+<INDEX>			{STRUCT}			{}
 <INDEX>			{VAR}			{if (wrongTypeVariables.contains(yytext())) { violation = true; variable = variable + " " + yytext(); }}
 <INDEX>			\(				{par=1; yybegin(PAR);}
 <INDEX>			\,				{}
