@@ -65,6 +65,7 @@ COMPLEX      = COMPLEX    | complex
 DOUBLE		 = DOUBLE     | double
 PREC		 = PRECISION  | precision
 DOUBLE_PREC	 = {DOUBLE}([\ ]*){PREC}
+DOUBLE_COMPLEX	 = {DOUBLE}([\ ]+)COMPLEX | {DOUBLE}([\ ]+)complex
 STRUCT		 = TYPE[\ ]*\(| type[\ ]*\(
 DIMENSION	 = "dimension"
 DATA		 = "data"
@@ -89,7 +90,7 @@ IMPLICIT	 = ([^a-zA-Z0-9\_])?"implicit"[^a-zA-Z0-9\_\n]
 USE_KW		 = ([^a-zA-Z0-9\_])?"use"[^a-zA-Z0-9\_\n]
 INITILIAZE 	 = {READ} 	| {DATA}	| {COMMON}		| {NAMELIST}	| {SAVE}	| {EQUIV}	| {CALL}
 CLE			 = {END}	| {GOTO}	| {EXT}			| {IMPLICIT}
-VAR_T     	 = {INTEGER}  | {LOGICAL}  | {CHARAC} | {REAL} | {COMPLEX} | {DOUBLE_PREC} | {STRUCT} 
+VAR_T     	 = {INTEGER}  | {LOGICAL}  | {CHARAC} | {REAL} | {COMPLEX} | {DOUBLE_PREC} | {DOUBLE_COMPLEX} | {STRUCT} 
 VAR_PAR		 = {VAR}{SPACE}*\( 
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 NUM			 = [0-9]+\.([0-9]*("e"|"d")(\-|\+)?[0-9]+)?((\_)?{VAR})?
@@ -181,7 +182,8 @@ SEE_FUNC	 = ([^a-zA-Z0-9\_])?("if" | "elseif" | "forall" | "while" | "where" | "
 		"system_clock", "date_and_time", "random_number", "random_seed",
 		"execute_command_line", "move_alloc", "new_line",
 		"omp_get_thread_num", "omp_get_num_threads", "omp_get_max_threads",
-		"omp_in_parallel", "omp_get_level", "omp_get_ancestor_thread_num"
+		"omp_in_parallel", "omp_get_level", "omp_get_ancestor_thread_num",
+		"and", "or"
 	));
 
     public COMDATAInitialisation() {

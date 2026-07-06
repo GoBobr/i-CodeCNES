@@ -56,7 +56,7 @@ COMMENT_LINE = \![^\n]*\n
 TYPE		 = "function" | "procedure"| "subroutine"	| "program" | "module" 
 END_TYPE 	 = "end"{SPACE}*{TYPE}
 DATA_TYPE 	 = ("integer"  | "real"	   | "complex" 		| "double"{SPACE}*"precision"	|
-			   "logical"  | "character"	| "type" | "class") ({SPACE}*\()?	
+			   "double"{SPACE}*"complex" | "logical"  | "character"	| "type" | "class") ({SPACE}*\()?	
 MOTS_CLES	 = ALLOCATABLE| allocatable | ALLOCATE | allocate | ASSIGN | assign | 
 			   BACKSPACE | backspace | BLOCK[\ ]DATA | block[\ ]data | CALL | call | 
 			   CASE | case | CLOSE | close | COMMON | common | CONTAINS | contains | 

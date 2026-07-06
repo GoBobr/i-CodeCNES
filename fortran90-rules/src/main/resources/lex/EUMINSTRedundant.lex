@@ -6,8 +6,8 @@
 
 /********************************************************************************/
 /* This file is used to generate a rule checker for EUM.INST.Redundant.         */
-/* Composite check for redundant features: D exponent notation (e.g. 1.23D-45), */
-/* CHARACTER*(*) notation, and statement functions.                             */
+/* Composite check for redundant features: CHARACTER*(*) notation,             */
+/* and statement functions. (D exponent removed — it is standard Fortran.)     */
 /********************************************************************************/
 
 package fr.cnes.icode.fortran90.rules;
@@ -45,8 +45,12 @@ MOD          = MODULE     | module
 TYPE         = {FUNC} | {PROC} | {SUB} | {PROG} | {MOD}
 VAR          = [a-zA-Z][a-zA-Z0-9\_]*
 STRING       = \'[^\']*\' | \"[^\"]*\"
-D_EXP        = [0-9]+\.?[0-9]*[Dd][+\-]?[0-9]+ | \.[0-9]+[Dd][+\-]?[0-9]+
 CHAR_STAR    = CHARACTER[\ \t]*\*[\ \t]*\(\*\) | character[\ \t]*\*[\ \t]*\(\*\)
+/* Derived-type component access: var%component or var(args)%component etc. */
+/* Must be matched BEFORE STMT_FUNC so var%component(args) = expr is not */
+/* misidentified as a statement function. */
+STRUCT       = {VAR}(\([^)]*\))?(\%{VAR}(\([^)]*\))?)+
+/* Statement function: name(args) = expr — simple name with argument list and = */
 STMT_FUNC    = {VAR}\([\ \t]*{VAR}[\ \t]*([,\ \t]*{VAR}[\ \t]*)*\)[\ \t]*=
 
 %{
@@ -90,8 +94,8 @@ STMT_FUNC    = {VAR}\([\ \t]*{VAR}[\ \t]*([,\ \t]*{VAR}[\ \t]*)*\)[\ \t]*=
 /************************/
 <YYINITIAL>     {COMMENT_WORD}  {yybegin(COMMENT);}
 <YYINITIAL>     {STRING}        {}
-<YYINITIAL>     {D_EXP}         {setError(location, "D exponent notation is obsolete. Use E exponent instead (e.g., 1.0E0 instead of 1.0D0).", yyline+1); yybegin(LINE);}
 <YYINITIAL>     {CHAR_STAR}     {setError(location, "CHARACTER*(*) notation is obsolete. Use CHARACTER(*) instead.", yyline+1); yybegin(LINE);}
+<YYINITIAL>     {STRUCT}        {yybegin(LINE);}
 <YYINITIAL>     {STMT_FUNC}     {setError(location, "Statement functions are obsolete. Use internal functions instead.", yyline+1); yybegin(LINE);}
 <YYINITIAL>     {TYPE}          {location = yytext(); yybegin(NAMING);}
 <YYINITIAL>     {VAR}           {yybegin(LINE);}
@@ -103,8 +107,8 @@ STMT_FUNC    = {VAR}\([\ \t]*{VAR}[\ \t]*([,\ \t]*{VAR}[\ \t]*)*\)[\ \t]*=
 /************************/
 <NEW_LINE>      {COMMENT_WORD}  {yybegin(COMMENT);}
 <NEW_LINE>      {STRING}        {}
-<NEW_LINE>      {D_EXP}         {setError(location, "D exponent notation is obsolete. Use E exponent instead (e.g., 1.0E0 instead of 1.0D0).", yyline+1); yybegin(LINE);}
 <NEW_LINE>      {CHAR_STAR}     {setError(location, "CHARACTER*(*) notation is obsolete. Use CHARACTER(*) instead.", yyline+1); yybegin(LINE);}
+<NEW_LINE>      {STRUCT}        {yybegin(LINE);}
 <NEW_LINE>      {STMT_FUNC}     {setError(location, "Statement functions are obsolete. Use internal functions instead.", yyline+1); yybegin(LINE);}
 <NEW_LINE>      {TYPE}          {location = yytext(); yybegin(NAMING);}
 <NEW_LINE>      {VAR}           {yybegin(LINE);}
@@ -116,8 +120,8 @@ STMT_FUNC    = {VAR}\([\ \t]*{VAR}[\ \t]*([,\ \t]*{VAR}[\ \t]*)*\)[\ \t]*=
 /************************/
 <LINE>          {COMMENT_WORD}  {yybegin(COMMENT);}
 <LINE>          {STRING}        {}
-<LINE>          {D_EXP}         {setError(location, "D exponent notation is obsolete. Use E exponent instead (e.g., 1.0E0 instead of 1.0D0).", yyline+1);}
 <LINE>          {CHAR_STAR}     {setError(location, "CHARACTER*(*) notation is obsolete. Use CHARACTER(*) instead.", yyline+1);}
+<LINE>          {STRUCT}        {}
 <LINE>          {STMT_FUNC}     {setError(location, "Statement functions are obsolete. Use internal functions instead.", yyline+1);}
 <LINE>          {TYPE}          {location = yytext(); yybegin(NAMING);}
 <LINE>          {VAR}           {}

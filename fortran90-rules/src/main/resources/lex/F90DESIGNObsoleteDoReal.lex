@@ -33,6 +33,7 @@ import fr.cnes.icode.data.CheckResult;
 %public
 %column
 %line
+%ignorecase
 
 
 %function run
@@ -57,7 +58,7 @@ TYPE		 = {FUNC}     | {PROC}	   | {SUB} | {PROG} | {MOD}
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 STRING		 = \'[^\']*\' | \"[^\"]*\"
 SPACE		 = [\ \t\r]
-STRUCT		 = {VAR}(\%{VAR})+
+STRUCT		 = {VAR}(\([^\)]*\))?(\%{VAR})+
 KEYWORD	 = "dimension"|"DIMENSION"|"allocatable"|"ALLOCATABLE"|"pointer"|"POINTER"|"intent"|"INTENT"|"save"|"SAVE"|"target"|"TARGET"|"external"|"EXTERNAL"|"intrinsic"|"INTRINSIC"|"optional"|"OPTIONAL"|"parameter"|"PARAMETER"|"public"|"PUBLIC"|"private"|"PRIVATE"|"volatile"|"VOLATILE"|"asynchronous"|"ASYNCHRONOUS"|"protected"|"PROTECTED"|"value"|"VALUE"|"contiguous"|"CONTIGUOUS"
 
 %{
@@ -100,10 +101,11 @@ END		  = end	  | END
 
 REAL        = real 				| REAL
 DOUBLE_PREC = double[\ ]+precision 	| DOUBLE[\ ]+PRECISION
+DOUBLE_COMPLEX = double[\ ]+complex | DOUBLE[\ ]+COMPLEX
 COMPLEX     = complex			| COMPLEX
 LOGICAL		= logical			| LOGICAL
 CHAR		= character			| CHARACTER
-WRONG_TYPE  = {REAL} 			| {DOUBLE_PREC} | {COMPLEX} | {LOGICAL} | {CHAR}
+WRONG_TYPE  = {REAL} 			| {DOUBLE_PREC} | {DOUBLE_COMPLEX} | {COMPLEX} | {LOGICAL} | {CHAR}
 INTRIN_INT  = "size" | "SIZE" | "lbound" | "LBOUND" | "ubound" | "UBOUND" | "len" | "LEN" |
 			  "len_trim" | "LEN_TRIM" | "kind" | "KIND" | "shape" | "SHAPE" | "count" | "COUNT" |
 			  "merge" | "MERGE" | "pack" | "PACK" | "unpack" | "UNPACK" | "reshape" | "RESHAPE" |

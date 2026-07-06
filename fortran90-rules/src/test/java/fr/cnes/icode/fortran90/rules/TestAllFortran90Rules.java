@@ -162,7 +162,7 @@ public class TestAllFortran90Rules implements ICodeCheckerTester {
                 {"/EUM/INST/FormatPlacement/error.f90", "/EUM/INST/FormatPlacement/noError.f90", new int[]{3}, new String[]{"subroutine mysub"}, EUMINSTFormatPlacement.class},
                 {"/EUM/INST/FreeFormatRead/error.f90", "/EUM/INST/FreeFormatRead/noError.f90", new int[]{3}, new String[]{"program essai"}, EUMINSTFreeFormatRead.class},
                 {"/EUM/NAME/FormatLabels/error.f90", "/EUM/NAME/FormatLabels/noError.f90", new int[]{4, 6}, new String[]{"program essai", "program essai"}, EUMNAMEFormatLabels.class},
-                {"/EUM/INST/Redundant/error.f90", "/EUM/INST/Redundant/noError.f90", new int[]{3}, new String[]{"program essai"}, EUMINSTRedundant.class},
+                {"/EUM/INST/Redundant/error.f90", "/EUM/INST/Redundant/noError.f90", new int[]{2}, new String[]{"program essai"}, EUMINSTRedundant.class},
                 {"/EUM/NAME/IdScope/error.f90", "/EUM/NAME/IdScope/noError.f90", new int[]{2}, new String[]{"program essai"}, EUMNAMEIdScope.class}
         };
     }

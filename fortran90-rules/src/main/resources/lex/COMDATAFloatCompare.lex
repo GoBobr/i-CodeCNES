@@ -107,7 +107,7 @@ NUM_LITERAL = [0-9]+\.?[0-9]*[dDeE][\-\+]?[0-9]+([_][a-zA-Z0-9_]+)? | \.[0-9]+[d
 /* encountered, we store all variables declared.								  */ 
 /* COMP words as /= or == are added.                                              */
 /* Mantis 310 and 311 add where and forall as NOTHING 							 */
-RULE_WORD    = ([^a-zA-Z0-9\_])?("real" | ("double"){SPACE}*("precision") | "complex")[^a-zA-Z0-9\_]
+RULE_WORD    = ([^a-zA-Z0-9\_])?("real" | ("double"){SPACE}*("precision") | ("double"){SPACE}*("complex") | "complex")[^a-zA-Z0-9\_]
 IMPLICIT	 = ([^a-zA-Z0-9\_])?("implicit")[^a-zA-Z0-9\_]
 COMP		 = "/=" | "==" | ".eq." | ".ne."
 NOTHING		 = ("if" | "elseif" | "forall" | "while" | "where" | "case"){SPACE}*"("
@@ -129,7 +129,8 @@ NO_ERR_FUNC	 =  ([^a-zA-Z0-9\_])?("achar" | "adjustl" | "adjustr" | "all" | "all
 							   "maxexponent" | "maxloc" | "merge_bits" | "minexponent" | "minloc" | "modulo" | "new_line" | "nint" | "not" | 
 							   "null" | "num_images" | "popcnt" | "poppar" | "radix" | "range" | "repeat" | "scan" | "selected_char_kind" | 
 							   "selected_int_kind" | "selected_real_kind" | "shape" | "shifta" | "shiftl" | "shiftr" | "size" | "storage_size" | 
-			   "this_image" | "trailz" | "trim" | "ubound" | "ucobound" | "verify" | "amin0" | "dint" | "dnint"| "omp_get_thread_num" | "omp_get_num_threads" | "omp_get_max_threads" | "omp_in_parallel" | "omp_get_level" | "omp_get_ancestor_thread_num"){SPACE}*"("
+			   "this_image" | "trailz" | "trim" | "ubound" | "ucobound" | "verify" | "amin0" | "dint" | "dnint"| "omp_get_thread_num" | "omp_get_num_threads" | "omp_get_max_threads" | "omp_in_parallel" | "omp_get_level" | "omp_get_ancestor_thread_num" |
+			   "and" | "or" | "iand" | "ior" | "ieor" | "not" | "ishft" | "ishftc" | "ibclr" | "ibset" | "btest" | "mvbits"){SPACE}*"("
 FUNCTION	 = {VAR}{SPACE}*"("
 DATA_TYPE	 = ("integer" | "logical" | "character" ) ( {SPACE} | {SPACE}*"(" | {SPACE}*"," | {SPACE}*"*" ) 
 

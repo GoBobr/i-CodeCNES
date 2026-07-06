@@ -52,7 +52,7 @@ MOD          = MODULE     | module
 TYPE		 = {FUNC}     | {PROC}	   | {SUB} | {PROG} | {MOD}
 DATA_TYPE	 = INTEGER |integer | LOGICAL | logical | CHARACTER | character |
                REAL	   | real	| COMPLEX | complex | DOUBLE[\ ]+PRECISION |
-               double[\ ]+precision
+               double[\ ]+precision | DOUBLE[\ ]+COMPLEX | double[\ ]+complex
 READ		 = "READ"
 WRITE		 = "WRITE"
 OPEN		 = "OPEN"
@@ -212,7 +212,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 								 if(variables.get(v) != null) {par=1; checkExpression(v); yybegin(AVOID);} }
 <NEW_LINE>		{OP_EXEP}		{exception=true; expression = true;}
 <NEW_LINE>		{EXP}			{expression = true;}
-<NEW_LINE>		{OPERATOR}		{expression = false; expressionType = "empty";}
+<NEW_LINE>		{OPERATOR}		{expression = false; expressionType = "LOGICAL";}
 <NEW_LINE>		{CONCAT}			{expression = false; expressionType = "empty";}
 <NEW_LINE>		\(				{par++;}
 <NEW_LINE>		\)				{par--; if(isArray) isArray=false;}
@@ -241,7 +241,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <LINE>			\({VAR}\)		{}
 <LINE>			{OP_EXEP}		{exception=true; expression = true;}
 <LINE>			{EXP}			{expression = true;}
-<LINE>			{OPERATOR}		{expression = false; expressionType = "empty";}
+<LINE>			{OPERATOR}		{expression = false; expressionType = "LOGICAL";}
 <LINE>			{CONCAT}		{expression = false; expressionType = "empty";}
 <LINE>			\(				{par++;}
 <LINE>			\)				{par--; if(isArray) isArray=false;}
@@ -355,7 +355,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <IF_STATE>		{VAR}			{if(!isArray) { checkExpression(yytext()); } end=true;}
 <IF_STATE>		{OP_EXEP}		{exception=true; expression = true;}
 <IF_STATE>		{EXP}			{expression = true;}
-<IF_STATE>		{OPERATOR}		{expression = false; expressionType = "empty";}
+<IF_STATE>		{OPERATOR}		{expression = false; expressionType = "LOGICAL";}
 <IF_STATE>		{CONCAT}		{expression = false; expressionType = "empty";}
 <IF_STATE>		\(				{par++;}
 <IF_STATE>		\)				{par--; if(isArray) isArray=false;

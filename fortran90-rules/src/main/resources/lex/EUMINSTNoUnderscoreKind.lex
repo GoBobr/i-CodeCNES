@@ -44,7 +44,10 @@ MOD             = MODULE     | module
 TYPE            = {FUNC} | {PROC} | {SUB} | {PROG} | {MOD}
 VAR             = [a-zA-Z][a-zA-Z0-9\_]*
 STRING          = \'[^\']*\' | \"[^\"]*\"
-UNDERSCORE_KIND = [a-zA-Z][a-zA-Z0-9]*_[0-9]+
+/* Kind notation: numeric literal followed by _kind (e.g., 1.0_8, 42_4) */
+/* Also matches type declarations with underscore kind (e.g., integer_8, real_4) */
+/* But NOT variable names like dum_4d — those have letters after the digits */
+UNDERSCORE_KIND = [0-9]+\.?[0-9]*[dDeE]?[+\-]?[0-9]*_[0-9]+ | (integer|real|complex|logical|character)[_][0-9]+
 
 %{
     String location = "MAIN PROGRAM";

@@ -46,7 +46,9 @@ TYPE         = {FUNC} | {PROC} | {SUB} | {PROG} | {MOD}
 VAR          = [a-zA-Z][a-zA-Z0-9\_]*
 STRING       = \'[^\']*\' | \"[^\"]*\"
 DECL_KW      = INTEGER | integer | REAL | real | DOUBLE[\ \t]*PRECISION | double[\ \t]*precision |
-               COMPLEX | complex | CHARACTER | character | LOGICAL | logical
+               COMPLEX | complex | CHARACTER | character | LOGICAL | logical |
+               DOUBLE[\ \t]*COMPLEX | double[\ \t]*complex |
+               TYPE[\ \t]*\( | type[\ \t]*\( | CLASS[\ \t]*\( | class[\ \t]*\(
 DOUBLE_COLON = "::"
 END_FUNC     = END[\ \t]+FUNCTION | end[\ \t]+function | END[\ \t]+SUBROUTINE | end[\ \t]+subroutine
 TYPED_FUNC   = {DECL_KW}[\ \t]+{FUNC}
