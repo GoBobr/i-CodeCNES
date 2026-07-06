@@ -189,3 +189,24 @@ CONTAINS
       END FUNCTION F_to_C
 
 END PROGRAM ESSAI
+
+! Test: SIZE() intrinsic in DO loop should not be flagged as real
+program size_do_test
+  implicit none
+  double precision, dimension(10) :: arr
+  integer :: i
+  do i = 1, size(arr)
+    arr(i) = 0.0D0
+  end do
+end program size_do_test
+
+! Test: INTEGER variable in DO loop should not be flagged as real
+program int_do_test
+  implicit none
+  integer :: maxvza
+  integer :: ivza
+  maxvza = 10
+  do ivza = 1, maxvza
+    maxvza = maxvza
+  end do
+end program int_do_test

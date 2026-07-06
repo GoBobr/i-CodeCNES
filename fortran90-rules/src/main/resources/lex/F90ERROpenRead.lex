@@ -211,6 +211,7 @@ IOSTAT 		 = ("iostat") {SPACE}* \= {SPACE}* {VAR}
 <IF_STATE>		
 		{
 			{LINE_COMMENT}		{}
+			"end"{SPACE}*"if"	{}
 			{IF_IOS}			{String checkedVal = yytext().replace(" ","").split("\\(")[1];
 								 if (!checkedVal.equals(iostatVal)) this.setError(location,"The return of IOSTAT is no checked in the " + descr + " instruction.", errorLine); 
 								 yybegin(YYINITIAL);}
@@ -218,8 +219,7 @@ IOSTAT 		 = ("iostat") {SPACE}* \= {SPACE}* {VAR}
 								 errorLine = yyline + 1; descr = yytext().toUpperCase().replaceAll("\\(", "").trim(); iostat=false; file=false; add=false; yybegin(OPEN);}
 			{READ}				{this.setError(location,"The return of IOSTAT is no checked in the " + descr + " instruction.", errorLine);
 								 errorLine = yyline + 1; descr = yytext().toUpperCase().replaceAll("\\(", "").trim(); iostat=false; add=false; yybegin(READ);}
-			{VAR}				{this.setError(location,"The return of IOSTAT is no checked in the " + descr + " instruction.", errorLine);
-								 yybegin(YYINITIAL);}
+			{VAR}				{if(yytext().equals(iostatVal)) {yybegin(YYINITIAL);}}
 			&{SPACE}*[^\n\r]	{}
 			\n|\r				{}
 			.					{}

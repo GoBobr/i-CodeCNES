@@ -53,6 +53,8 @@ TYPE		 = {FUNC}     | {PROC}	   | {SUB} | {PROG} | {MOD}	| {INTER}
 RETURN		 = "RETURN"
 END			 = "END"
 END_TYPE	 = {END} [\ ]+ {TYPE}
+THEN		 = "then" | "THEN"
+ENDIF		 = "endif" | "ENDIF" | ("end"[\ \t]*("if"|"IF"))
 IF_KW		 = ([^a-zA-Z0-9\_])?("if"|"IF")([\ \t]*\()
 COMP		 = "/="|"=="|"\.eq\."|"\.ne\."|"\.EQ\."|"\.NE\."|"\.lt\."|"\.le\."|"\.gt\."|"\.ge\."|"\.LT\."|"\.LE\."|"\.GT\."|"\.GE\."
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
@@ -65,6 +67,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 	boolean returnExist = false;
 	boolean lineHasIf = false;
 	boolean lineHasCompare = false;
+	int ifBlockDepth = 0;
 	
 	public COMFLOWExit(){
 		loc.add(location);
@@ -121,7 +124,9 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <NEW_LINE>		{STRING}		{}
 <NEW_LINE>		{TYPE}        	{location = yytext(); yybegin(NAMING);}
 <NEW_LINE>		{IF_KW}			{lineHasIf = true;}
+<NEW_LINE>		{THEN}			{if(lineHasIf) ifBlockDepth++;}
 <NEW_LINE>		{COMP}			{lineHasCompare = true;}
+<NEW_LINE>		{ENDIF}			{if(ifBlockDepth > 0) ifBlockDepth--;}
 <NEW_LINE>		{END_TYPE}		{
 									if(loc.isEmpty()){
 										
@@ -138,7 +143,9 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 					                    throw new JFlexException(this.getClass().getName(), parsedFileName,
                                     errorMessage, yytext(), yyline, yycolumn);
 							 	 }
-								 if(!lineHasIf || !lineHasCompare){
+								 if(ifBlockDepth > 0) {
+									/* RETURN inside IF...THEN block -- don't count as extra exit */
+								 } else if(!lineHasIf || !lineHasCompare){
 								 if(returnExist){
 								 	setError(loc.get(loc.size()-1),"There is more than one exit in the function.", yyline+1);
 								 }else{
@@ -156,7 +163,9 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <LINE>			{STRING}		{}
 <LINE>			{TYPE}        	{location=yytext(); yybegin(NAMING);}
 <LINE>			{IF_KW}			{lineHasIf = true;}
+<LINE>			{THEN}			{if(lineHasIf) ifBlockDepth++;}
 <LINE>			{COMP}			{lineHasCompare = true;}
+<LINE>			{ENDIF}			{if(ifBlockDepth > 0) ifBlockDepth--;}
 <LINE>			{END_TYPE}		{
 									if(loc.isEmpty()){
 										
@@ -173,7 +182,9 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 					                    throw new JFlexException(this.getClass().getName(), parsedFileName,
                                     errorMessage, yytext(), yyline, yycolumn);
 							 	 }
-								 if(!lineHasIf || !lineHasCompare){ 
+								 if(ifBlockDepth > 0) { 
+									/* RETURN inside IF...THEN block -- don't count as extra exit */
+								 } else if(!lineHasIf || !lineHasCompare){ 
 								 if(returnExist){ 
 								 	setError(loc.get(loc.size()-1),"There is more than one exit in the function.", yyline+1);
 								 }else{ 

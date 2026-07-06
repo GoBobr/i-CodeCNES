@@ -56,7 +56,7 @@ COMMENT_LINE = \![^\n]*\n
 TYPE		 = "function" | "procedure"| "subroutine"	| "program" | "module" 
 END_TYPE 	 = "end"{SPACE}*{TYPE}
 DATA_TYPE 	 = ("integer"  | "real"	   | "complex" 		| "double"{SPACE}*"precision"	|
-			   "logical"  | "character"	| "type") ({SPACE}*\()?	
+			   "logical"  | "character"	| "type" | "class") ({SPACE}*\()?	
 MOTS_CLES	 = ALLOCATABLE| allocatable | ALLOCATE | allocate | ASSIGN | assign | 
 			   BACKSPACE | backspace | BLOCK[\ ]DATA | block[\ ]data | CALL | call | 
 			   CASE | case | CLOSE | close | COMMON | common | CONTAINS | contains | 
@@ -74,7 +74,19 @@ MOTS_CLES	 = ALLOCATABLE| allocatable | ALLOCATE | allocate | ASSIGN | assign |
 			   RECURSIVE | recursive | RESULT | result | RETURN | return | REWIND | rewind | 
 			   REWRITE | rewrite | SAVE | save | SELECT | select | SEQUENCE | sequence | 
 			   STOP | stop | SUBROUTINE | subroutine | TARGET | target | THEN | then | TRUE | true | 
-			   USE | use | WHERE | where | WHILE | while | WRITE | write
+		   USE | use | WHERE | where | WHILE | while | WRITE | write |
+		   FINAL | final | GENERIC | generic | DEFAULT | default | CLASS | class |
+		   ASSIGNMENT | assignment | IMPORT | import |
+		   VOLATILE | volatile | ASYNCHRONOUS | asynchronous | BIND | bind |
+		   PROTECTED | protected | VALUE | value | CONTIGUOUS | contiguous |
+		   ABSTRACT | abstract | EXTENDS | extends | DEFERRED | deferred |
+		   NON_OVERRIDABLE | non_overridable | PASS | pass | NOPASS | nopass |
+		   PURE | pure | ELEMENTAL | elemental |
+		   ENDMODULE | endmodule | ENDSUBROUTINE | endsubroutine |
+		   ENDFUNCTION | endfunction | ENDPROGRAM | endprogram | ENDINTERFACE | endinterface |
+		   ENDSELECT | endselect | FORALL | forall |
+		   ASSOCIATE | associate | BLOCK | block | CRITICAL | critical |
+		   SUBMODULE | submodule
 FUNC_INTRIN  = ABS | abs | ACHAR | ACOS | ADJUSTL | ADJUSTR | AIMAG | AINT | ALL | ALLOCATED | 
 		       ANINT | ANY | ASIN | ASSOCIATED | ATAN | ATAN2 | BIT_SIZE | BTEST | CEILING | CHAR | 
 		       CMPLX | CONJG | COS | COSH | COUNT | CSHIFT | DBLE | DIGITS | DIM | DPROD | EOSHIFT | 
@@ -108,6 +120,8 @@ SPACE		 = [\ \t\f\r]
 LOGIC_OP	 = "\.and\."|"\.or\."|"\.not\."|"\.eqv\."|"\.neqv\."|"\.AND\."|"\.OR\."|"\.NOT\."|"\.EQV\."|"\.NEQV\."
 CALL_VAR	 = ("call"|"CALL"){SPACE}+{VAR}
 TYPE_NAME	 = ("type"|"TYPE"|"class"|"CLASS"){SPACE}*\({SPACE}*{VAR}{SPACE}*\)
+NUM_LITERAL = [0-9]+\.?[0-9]*[dDeE][\-\+]?[0-9]+([_][a-zA-Z0-9_]+)? | \.[0-9]+[dDeE][\-\+]?[0-9]+([_][a-zA-Z0-9_]+)?
+PREPROC     = \#[^\n]*
 
 /* Variable "location" is used to determine rule's error location (function,	*/
 /* procedure, etc.).															*/
@@ -129,6 +143,8 @@ TYPE_NAME	 = ("type"|"TYPE"|"class"|"CLASS"){SPACE}*\({SPACE}*{VAR}{SPACE}*\)
 	/** List of possible error line **/	
 	List<Integer> errorLine = new LinkedList<Integer>();
 	int parenthese = 0;
+	boolean useWithoutOnly = false;
+	boolean hasOnly = false;
 	
 	public F90DATADeclaration() {
     }
@@ -143,8 +159,10 @@ TYPE_NAME	 = ("type"|"TYPE"|"class"|"CLASS"){SPACE}*\({SPACE}*{VAR}{SPACE}*\)
 	private void comparerError()throws JFlexException{
 		for(int i=0; i < possibleError.size(); i++){
 			if(!variables.contains(possibleError.get(i))){
-				setError(errorLocation.get(i),"The variable "+ possibleError.get(i) +" must be declared." , errorLine.get(i)+1); 
-				variables.add(possibleError.get(i));
+				if(!useWithoutOnly){
+					setError(errorLocation.get(i),"The variable "+ possibleError.get(i) +" must be declared." , errorLine.get(i)+1); 
+					variables.add(possibleError.get(i));
+				}
 			}
 		}
 	}
@@ -198,14 +216,15 @@ TYPE_NAME	 = ("type"|"TYPE"|"class"|"CLASS"){SPACE}*\({SPACE}*{VAR}{SPACE}*\)
 <IMPLICITE>
 		{
 			{COMMENT_LINE}				{}
+			{PREPROC}					{}
 			"use"						{yybegin(WAIT);}
 			"implicit"{SPACE}*"none"	{yybegin(NEW_LINE);}
 			{CLE}						{}
 			{LOGIC_OP}					{}
+			{NUM_LITERAL}				{}
 			\&{SPACE}*\n				{}
-			{DATA_TYPE}					{setError(location,"The sequence IMPLICIT NONE must be declared after the method. ", line); yybegin(LINE);
-										 yybegin(WAIT_2);}
-			{VAR}						{setError(location,"The sequence IMPLICIT NONE must be declared after the method. ", line); yybegin(LINE);}
+			{DATA_TYPE}					{yybegin(WAIT_2);}
+			{VAR}						{yybegin(LINE);}
 			[^]						{}
 		} 		
 
@@ -229,17 +248,19 @@ TYPE_NAME	 = ("type"|"TYPE"|"class"|"CLASS"){SPACE}*\({SPACE}*{VAR}{SPACE}*\)
 		{
 		  	{COMMENT_WORD} 			{yybegin(COMMENT);}
 			{STRING}				{yybegin(LINE);}
+			{PREPROC}				{}
 			"COMMON" | "NAMELIST"	{yybegin(SAVE);}
 			{TYPE}        			{location = yytext(); yybegin(NAMING);}
 			"interface"				{yybegin(INTERFACE);}
 			{END_TYPE}				{yybegin(COMMENT);}
 			{DATA_TYPE}				{yybegin(WAIT_2);}
-			{TYPE_NAME}				{}
+			{TYPE_NAME}				{yybegin(WAIT_2);}
 			{CALL_VAR}				{}
-			"use"					{yybegin(USE_STATE);}
-			"private"				{yybegin(SAVE);}
+			"use"					{hasOnly = false; yybegin(USE_STATE);}
+			"private" | "public"	{yybegin(SAVE);}
 			{CLE}					{}
 			{LOGIC_OP}				{}
+			{NUM_LITERAL}			{}
 			(\%{VAR})+				{}
 			{VAR}{SPACE}*\(			{parenthese=1; yybegin(WAIT_3);}
 			{VAR}					{if (!variables.contains(yytext())){
@@ -261,16 +282,18 @@ TYPE_NAME	 = ("type"|"TYPE"|"class"|"CLASS"){SPACE}*\({SPACE}*{VAR}{SPACE}*\)
 			
 		  	{COMMENT_WORD} 			{yybegin(COMMENT);}
 			{STRING}				{yybegin(LINE);}
+			{PREPROC}				{}
 			{TYPE}        			{location = yytext(); yybegin(NAMING);}
 			"COMMON" | "NAMELIST"	{yybegin(SAVE);}
 			"interface"				{yybegin(INTERFACE);}
 			{END_TYPE}				{yybegin(COMMENT);}
-			{TYPE_NAME}				{}
+			{TYPE_NAME}				{yybegin(WAIT_2);}
 			{CALL_VAR}				{}
-			"use"					{yybegin(USE_STATE);}
-			"private"				{yybegin(SAVE);}
+			"use"					{hasOnly = false; yybegin(USE_STATE);}
+			"private" | "public"	{yybegin(SAVE);}
 			{CLE}					{}
 			{LOGIC_OP}				{}
+			{NUM_LITERAL}			{}
 			(\%{VAR})+				{}
 			{VAR}{SPACE}*\(			{parenthese=1; yybegin(WAIT_3);}
 			{VAR}					{if (!variables.contains(yytext())){
@@ -288,10 +311,10 @@ TYPE_NAME	 = ("type"|"TYPE"|"class"|"CLASS"){SPACE}*\({SPACE}*{VAR}{SPACE}*\)
 <USE_STATE>
 		{
 			{COMMENT_LINE}				{}
-			"only"{SPACE}*:			{}
+			"only"{SPACE}*:			{hasOnly = true;}
 			{VAR}					{variables.add(yytext().toLowerCase());}
 			\&{SPACE}*\n			{}
-			\n              			{yybegin(NEW_LINE);}
+			\n              		{if(!hasOnly) useWithoutOnly = true; yybegin(NEW_LINE);}
       		.               		{}
 		}
 

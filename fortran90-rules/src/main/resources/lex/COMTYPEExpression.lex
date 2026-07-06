@@ -74,6 +74,7 @@ REAL		 = "REAL" [\ ]* \(
 CONVERSION	 = {CONV} [\ ]* \(
 OP_EXEP		 = \*		  | \*\*
 EXP			 = \+		  | \-		   | "/"&&!"//"
+CONCAT		 = "//"
 LOGIC	     = \.AND\.	  | \.OR\.	   | \.NEQV\.		| \.XOR\.	|
 			   \.EQV\.	  | \.NOT\.
 RELAT		 = \.LT\.	  | \.LE\.	   | \.EQ\.			| \.NE\.	|
@@ -82,6 +83,7 @@ RELAT		 = \.LT\.	  | \.LE\.	   | \.EQ\.			| \.NE\.	|
 OPERATOR     = {LOGIC}    | {RELAT} 
 STRUCT		 = {VAR} (\([^\)]*\))? \%
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
+DNUM		 = [0-9]+\.?[0-9]*[dD][\-\+]?[0-9]+([_][a-zA-Z0-9_]+)? | \.[0-9]+[dD][\-\+]?[0-9]+([_][a-zA-Z0-9_]+)?
 NUM			 = [0-9]+\.([0-9]*([eE][\-\+]?[0-9]+)?)?([_]{VAR})?
 INT_NUM		 = [0-9]+([_]{VAR})?
 STRING		 = \'[^\']*\' | \"[^\"]*\"
@@ -119,18 +121,20 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 	private void checkExpression(String var) throws JFlexException {
 		String key = variables.get(var);
 		if (key != null) {
+			key = key.replaceAll("\\s+", " ").trim();
+			String et = expressionType.replaceAll("\\s+", " ").trim();
 			if(exception && expression) {
-				if(!key.equals("integer") && !expressionType.equals(key) && !expressionType.equals("empty")
-				   && !(expressionType.equals("integer") && (key.equals("REAL") || key.equals("DOUBLE PRECISION"))))
+				if(!key.equals("integer") && !et.equals(key) && !et.equals("empty")
+				   && !(et.equals("integer") && (key.equals("REAL") || key.equals("DOUBLE PRECISION"))))
 					error = true;
 				exception = false;
 			}
 			else  {
-				if (expressionType.equals("empty")) 
+				if (et.equals("empty")) 
 					expressionType = key;
-				else if (!expressionType.equals(key)
-						 && !(expressionType.equals("integer") && (key.equals("REAL") || key.equals("DOUBLE PRECISION")))
-						 && !(key.equals("integer") && (expressionType.equals("REAL") || expressionType.equals("DOUBLE PRECISION")))) 
+				else if (!et.equals(key)
+						 && !(et.equals("integer") && (key.equals("REAL") || key.equals("DOUBLE PRECISION")))
+						 && !(key.equals("integer") && (et.equals("REAL") || et.equals("DOUBLE PRECISION")))) 
 					error = true;
 			}
 			
@@ -194,6 +198,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <NEW_LINE>		{DATA_TYPE}		{type=yytext().toUpperCase(); yybegin(DECL_PARAMS);}
 <NEW_LINE>		{CONVERSION}	{par++; conv=yytext().toLowerCase(); yybegin(CONV_FUNC);}
 <NEW_LINE>		{IF}			{yybegin(IF_STATE);}<NEW_LINE>		{STRUCT}			{expressionType="empty"; expression=false; exception=false; error=false;}
+<NEW_LINE>		{DNUM}			{if(expressionType.equals("empty")) expressionType="DOUBLE PRECISION"; expression=true;}
 <NEW_LINE>		{NUM}			{if(expressionType.equals("empty")) expressionType="REAL"; expression=true;}
 <NEW_LINE>		{INT_NUM}			{if(expressionType.equals("empty")) expressionType="INTEGER"; expression=true;}
 <NEW_LINE>		{VAR}			{if(!isArray) { checkExpression(yytext()); }}
@@ -202,6 +207,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <NEW_LINE>		{OP_EXEP}		{exception=true; expression = true;}
 <NEW_LINE>		{EXP}			{expression = true;}
 <NEW_LINE>		{OPERATOR}		{expression = false; expressionType = "empty";}
+<NEW_LINE>		{CONCAT}			{expression = false; expressionType = "empty";}
 <NEW_LINE>		\(				{par++;}
 <NEW_LINE>		\)				{par--; if(isArray) isArray=false;}
 <NEW_LINE>  	\n             	{expressionType="empty"; expression = false; exception = false; error = false; errorThrown=false; isArray = false; par=0;}
@@ -219,6 +225,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <LINE>			{DATA_TYPE}		{type=yytext().toUpperCase(); yybegin(DECL_PARAMS);}
 <LINE>			{CONVERSION}	{par++; conv=yytext().toLowerCase(); yybegin(CONV_FUNC); end=true;}
 <LINE>			{IF}				{yybegin(IF_STATE);}
+<LINE>			{DNUM}			{if(expressionType.equals("empty")) expressionType="DOUBLE PRECISION"; expression=true; end=true;}
 <LINE>			{NUM}			{if(expressionType.equals("empty")) expressionType="REAL"; expression=true; end=true;}
 <LINE>			{INT_NUM}			{if(expressionType.equals("empty")) expressionType="INTEGER"; expression=true; end=true;}
 <LINE>			{VAR}			{if(!isArray) { checkExpression(yytext()); } end=true;}
@@ -228,6 +235,7 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <LINE>			{OP_EXEP}		{exception=true; expression = true;}
 <LINE>			{EXP}			{expression = true;}
 <LINE>			{OPERATOR}		{expression = false; expressionType = "empty";}
+<LINE>			{CONCAT}		{expression = false; expressionType = "empty";}
 <LINE>			\(				{par++;}
 <LINE>			\)				{par--; if(isArray) isArray=false;}
 <LINE>			\&				{end=false;}
@@ -331,12 +339,14 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 /************************/
 <IF_STATE>		{STRING}		{}
 <IF_STATE>		{STRUCT}			{expressionType="empty"; expression=false; exception=false; error=false;}
+<IF_STATE>		{DNUM}			{if(expressionType.equals("empty")) expressionType="DOUBLE PRECISION"; expression=true;}
 <IF_STATE>		{NUM}			{if(expressionType.equals("empty")) expressionType="REAL"; expression=true;}
 <IF_STATE>		{INT_NUM}			{if(expressionType.equals("empty")) expressionType="INTEGER"; expression=true;}
 <IF_STATE>		{VAR}			{if(!isArray) { checkExpression(yytext()); } end=true;}
 <IF_STATE>		{OP_EXEP}		{exception=true; expression = true;}
 <IF_STATE>		{EXP}			{expression = true;}
 <IF_STATE>		{OPERATOR}		{expression = false; expressionType = "empty";}
+<IF_STATE>		{CONCAT}		{expression = false; expressionType = "empty";}
 <IF_STATE>		\(				{par++;}
 <IF_STATE>		\)				{par--; if(isArray) isArray=false;
 								 if(par==0){expressionType="empty"; expression = false; exception = false; error = false; isArray = false; yybegin(LINE);}}

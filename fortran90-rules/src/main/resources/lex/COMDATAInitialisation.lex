@@ -45,7 +45,7 @@ import fr.cnes.icode.exception.JFlexException;
 %type List<CheckResult>
 
 
-%state COMMENT, NAMING, NEW_LINE, LINE, INIT, VAR_EQ, WAIT, FUNC, AVOID, DATA, WAIT_ARRAY, PARAMS, ARRAY, DECLARATION
+%state COMMENT, NAMING, NEW_LINE, LINE, INIT, VAR_EQ, WAIT, FUNC, AVOID, DATA, WAIT_ARRAY, PARAMS, ARRAY, DECLARATION, USE_STATE
 
 COMMENT_WORD = \! 
 FREE_COMMENT = \!
@@ -73,6 +73,9 @@ INTENTIN		 = "intent" {SPACE}*\({SPACE}*"in"{SPACE}*\)|"INTENT" {SPACE}*\({SPACE
 INTENTOUT		 = "intent" {SPACE}*\({SPACE}*"out"{SPACE}*\)|"INTENT" {SPACE}*\({SPACE}*"OUT"{SPACE}*\)
 INTENTINOUT		 = "intent" {SPACE}*\({SPACE}*"inout"{SPACE}*\)|"INTENT" {SPACE}*\({SPACE}*"INOUT"{SPACE}*\)
 PARAMETER		 = "parameter"
+POINTER_ASSIGN	 = \=\>
+NUM_LITERAL	 = [0-9]+\.?[0-9]*[dDeE][\-\+]?[0-9]+([_][a-zA-Z0-9_]+)? | \.[0-9]+[dDeE][\-\+]?[0-9]+([_][a-zA-Z0-9_]+)?
+IMPLIED_DO	 = \/\/?\s*\(?\s*{VAR}\s*,\s*{VAR}\s*\=
 READ		 = ([^a-zA-Z0-9\_])?"read"[^a-zA-Z0-9\_\n]
 COMMON		 = ([^a-zA-Z0-9\_])?"common"[^a-zA-Z0-9\_\n]
 NAMELIST	 = ([^a-zA-Z0-9\_])?"namelist"[^a-zA-Z0-9\_\n]
@@ -83,6 +86,7 @@ GOTO		 = ([^a-zA-Z0-9\_])?"go"[\ ]*"to"[^a-zA-Z0-9\_\n]
 EXT			 = ([^a-zA-Z0-9\_])?"external"[^a-zA-Z0-9\_\n]
 CALL		 = ([^a-zA-Z0-9\_])?"call"[^a-zA-Z0-9\_\n]
 IMPLICIT	 = ([^a-zA-Z0-9\_])?"implicit"[^a-zA-Z0-9\_\n]
+USE_KW		 = ([^a-zA-Z0-9\_])?"use"[^a-zA-Z0-9\_\n]
 INITILIAZE 	 = {READ} 	| {DATA}	| {COMMON}		| {NAMELIST}	| {SAVE}	| {EQUIV}	| {CALL}
 CLE			 = {END}	| {GOTO}	| {EXT}			| {IMPLICIT}
 VAR_T     	 = {INTEGER}  | {LOGICAL}  | {CHARAC} | {REAL} | {COMPLEX} | {DOUBLE_PREC} | {STRUCT} 
@@ -123,6 +127,11 @@ SEE_FUNC	 = ([^a-zA-Z0-9\_])?("if" | "elseif" | "forall" | "while" | "where" | "
 	boolean isIntentOut=false;
 	//name of sunroutine
 	String nameType="";
+	//when parameter attribute is present (variable is initialized)
+	boolean isParameter=false;
+	//when USE without ONLY is present (suppress undeclared errors)
+	boolean useWithoutOnly=false;
+	boolean hasOnly=false;
 	
 	// Fortran attribute keywords that should not be treated as variables
 	Set<String> fortranKeywords = new HashSet<String>(Arrays.asList(
@@ -286,7 +295,7 @@ SEE_FUNC	 = ([^a-zA-Z0-9\_])?("if" | "elseif" | "forall" | "while" | "where" | "
 						if(entList.size() > (i+3)){
 							final String error= entList.get(i+3).substring(entList.get(i+3).indexOf("=")+1, entList.get(i+3).length());
 							final String paramVar= entList.get(i).substring(entList.get(i).indexOf("=")+1, entList.get(i).length());
-							if("true".equals(error)){
+							if("true".equals(error) && !useWithoutOnly){
 								final String dLocation= entList.get(i+1).substring(entList.get(i+1).indexOf("=")+1, entList.get(i+1).length());
 								final String line= entList.get(i+2).substring(entList.get(i+2).indexOf("=")+1, entList.get(i+2).length());									
 								setError(dLocation,"The variable " + paramVar + " is used before being initialized. ", Integer.parseInt(line));
@@ -402,6 +411,7 @@ return getCheckResults();
 									
 								}
 <NEW_LINE>      {VAR_T}			{yybegin(DECLARATION);}
+<NEW_LINE>		{USE_KW}			{hasOnly = false; yybegin(USE_STATE);}
 <NEW_LINE>		{CLE}			{yybegin(AVOID);}
 <NEW_LINE>		{SEE_FUNC}		{}
 <NEW_LINE>	    {COMP}   		{
@@ -423,6 +433,14 @@ return getCheckResults();
 								 }
 								 		
 								}
+<NEW_LINE>		{NUM_LITERAL}	{}
+<NEW_LINE>		{IMPLIED_DO}	{String var = yytext().replaceAll("[^a-zA-Z0-9_,=\\s\\(\\/\\)]", "").trim();
+								 String[] parts = var.split("[,=]");
+								 if(parts.length >= 2) {
+									 String loopVar = parts[1].trim();
+									 if(variables.containsKey(loopVar)) variables.put(loopVar, true);
+								 }
+								 yybegin(LINE);}
 <NEW_LINE>		{VAR}			{if(variables.containsKey(yytext())) { variable = yytext(); initialized = false; yybegin(VAR_EQ);} } 
 <NEW_LINE>		{NUM}|{POINT}	{yybegin(LINE);}
 <NEW_LINE>  	\n             	{}
@@ -446,6 +464,7 @@ return getCheckResults();
 									 yybegin(DATA);
 							    }
 <LINE>   	    {VAR_T}			{yybegin(DECLARATION);}
+<LINE>			{USE_KW}			{hasOnly = false; yybegin(USE_STATE);}
 <LINE>			{CLE}			{yybegin(AVOID);}
 <LINE>	        {SEE_FUNC}		{}
 <LINE>	        {COMP}   		{
@@ -466,7 +485,9 @@ return getCheckResults();
 								  }
 								}
 <LINE>			{VAR}			{if(variables.containsKey(yytext())) { variable = yytext(); initialized = false; yybegin(VAR_EQ);} } 
+<LINE>			{NUM_LITERAL}	{}
 <LINE>			{NUM}|{POINT}	{}
+<LINE>			{POINTER_ASSIGN}	{isPotentialError = false; if(variables.containsKey(variable)) variables.put(variable, true);}
 <LINE>			{EQUAL} 		{isPotentialError = false;;if(variables.containsKey(variable)) variables.put(variable, true ); }
 <LINE>      	\n             	{if(isPotentialError && variables.containsKey(variable)){
 									Boolean init = variables.get(variable);
@@ -486,7 +507,7 @@ return getCheckResults();
 <INIT>			{COMMENT_LINE}		{}
 <INIT>			{STRING}			{}
 <INIT>		  	{VAR} 				{variable = yytext(); fin=true;
-									 if (isIntentIn){
+									 if (isIntentIn || isParameter){
 									 	variables.put(variable, true);
 									 	setErrorVariableByType(nameType, variable);
 									 } else if(!variables.containsKey(variable)) variables.put(variable, false);
@@ -497,7 +518,7 @@ return getCheckResults();
 <INIT>			{SPACE}				{}
 <INIT>			\&{SPACE}*\n		{}
 <INIT>			\n[\ ]{1,5}{SIMBOL}	{}
-<INIT>			\n					{dim=false; isIntentIn=false; isIntentOut=false; if(fin)yybegin(NEW_LINE);}
+<INIT>			\n					{dim=false; isIntentIn=false; isIntentOut=false; isParameter=false; if(fin)yybegin(NEW_LINE);}
 <INIT>			.					{fin=true;}
 
 /************************/
@@ -506,6 +527,7 @@ return getCheckResults();
 <DECLARATION>	{TYPE}				{location = yytext(); yybegin(NAMING);}
 <DECLARATION>	{STRING}	        {}
 <DECLARATION>	{DIMENSION}		    {dim=true;}
+<DECLARATION>	{PARAMETER}		    {isParameter=true;}
 <DECLARATION>	{INTENTIN}		    {dim=false; isIntentIn=true;}
 <DECLARATION>	{INTENTOUT}		    {dim=false; isIntentOut=true;}
 <DECLARATION>	{INTENTINOUT}	    {dim=false; isIntentIn=true;}
@@ -600,6 +622,8 @@ return getCheckResults();
 								 if (!dimension.contains(var)) { par = 1; yybegin(FUNC);}  }
 <VAR_EQ>		{VAR}{SPACE}*\=		{String v = yytext().replaceAll("[\\s=]", ""); variables.put(v, true); initialized = true;}
 <VAR_EQ>		{VAR}			{variable = yytext(); initialized = false;}
+<VAR_EQ>		{POINTER_ASSIGN} 	{initialized = true;
+							 variables.put(variable, true ); yybegin(AVOID);}
 <VAR_EQ>		{EQUAL} 		{initialized = true;
 								 variables.put(variable, true ); }
 <VAR_EQ>		{COMP}          {}
@@ -617,6 +641,16 @@ return getCheckResults();
 								 } 
 								 initialized = false; variable = yytext();
 								}
+
+/************************/
+/* USE_STATE            */
+/************************/
+<USE_STATE>		{COMMENT_LINE}		{}
+<USE_STATE>		"only"{SPACE}*":"	{hasOnly = true;}
+<USE_STATE>		{VAR}				{variables.put(yytext(), true);}
+<USE_STATE>		\&{SPACE}*\n		{}
+<USE_STATE>		\n					{if(!hasOnly) useWithoutOnly = true; yybegin(NEW_LINE);}
+<USE_STATE>		.					{}
 
 /************************/
 /* ERROR STATE	        */

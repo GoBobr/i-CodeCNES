@@ -56,6 +56,7 @@ VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 STRING		 = \'[^\']*\' | \"[^\"]*\"
 LOGIC_OP	 = "\.and\."|"\.or\."|"\.not\."|"\.eqv\."|"\.neqv\."|"\.AND\."|"\.OR\."|"\.NOT\."|"\.EQV\."|"\.NEQV\."
 STRUCT		 = {VAR}\%
+NUM_LITERAL = [0-9]+\.?[0-9]*[dDeE][\-\+]?[0-9]+([_][a-zA-Z0-9_]+)? | \.[0-9]+[dDeE][\-\+]?[0-9]+([_][a-zA-Z0-9_]+)?
 
 /* Two lists are created. The first one contains all declared variables. The second	*/
 /* one stands for all variables in one instruction.								 	*/
@@ -210,6 +211,7 @@ DATA_TYPE	 = ("integer" | "logical" | "character" ) ( {SPACE} | {SPACE}*"(" | {S
 <BRACE>			
 		{
 			{COMMENT_LINE}		{}
+			{NUM_LITERAL}		{}
 			{NO_ERR_FUNC}		{brace = brace + 1;}
 			{ERR_FUNC}			{String var = yytext().toLowerCase().substring(0, yytext().length()-1).trim();
 								 if (!isIgnored) {
@@ -276,6 +278,7 @@ DATA_TYPE	 = ("integer" | "logical" | "character" ) ( {SPACE} | {SPACE}*"(" | {S
 <COMPARE>			
 		{	
 			{COMMENT_LINE}	{}
+			{NUM_LITERAL}	{}
 			{NO_ERR_FUNC}	{isIgnored = true;
 							 canSetError = false;
 							 yybegin(BRACE);}
@@ -328,6 +331,7 @@ DATA_TYPE	 = ("integer" | "logical" | "character" ) ( {SPACE} | {SPACE}*"(" | {S
 		{
 			{COMMENT_LINE}	{}
 			{STRING}		{}
+			{NUM_LITERAL}	{firstFloat = false;}
 			{LOGIC_OP}		{firstFloat = false;}
 			{STRUCT}		{firstFloat = false;}
 			{FALSE}			{if (allVariables.contains(yytext().toLowerCase())){

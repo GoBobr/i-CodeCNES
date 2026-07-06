@@ -104,7 +104,27 @@ COMPLEX     = complex			| COMPLEX
 LOGICAL		= logical			| LOGICAL
 CHAR		= character			| CHARACTER
 WRONG_TYPE  = {REAL} 			| {DOUBLE_PREC} | {COMPLEX} | {LOGICAL} | {CHAR}
-%%          
+INTRIN_INT  = "size" | "SIZE" | "lbound" | "LBOUND" | "ubound" | "UBOUND" | "len" | "LEN" |
+			  "len_trim" | "LEN_TRIM" | "kind" | "KIND" | "shape" | "SHAPE" | "count" | "COUNT" |
+			  "merge" | "MERGE" | "pack" | "PACK" | "unpack" | "UNPACK" | "reshape" | "RESHAPE" |
+			  "spread" | "SPREAD" | "cshift" | "CSHIFT" | "eoshift" | "EOSHIFT" | "transpose" | "TRANSPOSE" |
+			  "matmul" | "MATMUL" | "dot_product" | "DOT_PRODUCT" | "scan" | "SCAN" | "verify" | "VERIFY" |
+			  "index" | "INDEX" | "repeat" | "REPEAT" | "trim" | "TRIM" | "adjustl" | "ADJUSTL" |
+			  "adjustr" | "ADJUSTR" | "selected_int_kind" | "SELECTED_INT_KIND" | "selected_char_kind" | "SELECTED_CHAR_KIND" |
+			  "command_argument_count" | "COMMAND_ARGUMENT_COUNT" | "storage_size" | "STORAGE_SIZE" |
+			  "new_line" | "NEW_LINE" | "leadz" | "LEADZ" | "trailz" | "TRAILZ" | "popcnt" | "POPCNT" |
+			  "poppar" | "POPPAR" | "maskl" | "MASKL" | "maskr" | "MASKR" | "shiftl" | "SHIFTL" |
+			  "shiftr" | "SHIFTR" | "shifta" | "SHIFTA" | "merge_bits" | "MERGE_BITS" | "iand" | "IAND" |
+			  "ior" | "IOR" | "ieor" | "IEOR" | "not" | "NOT" | "ibclr" | "IBCLR" | "ibset" | "IBSET" |
+			  "btest" | "BTEST" | "ishft" | "ISHFT" | "ishftc" | "ISHFTC" | "mvbits" | "MVBITS" |
+			  "dshiftl" | "DSHIFTL" | "dshiftr" | "DSHIFTR" | "digits" | "DIGITS" | "radix" | "RADIX" |
+			  "minexponent" | "MINEXPONENT" | "maxexponent" | "MAXEXPONENT" | "exponent" | "EXPONENT" |
+			  "precision" | "PRECISION" | "range" | "RANGE" | "floor" | "FLOOR" | "ceiling" | "CEILING" |
+			  "nint" | "NINT" | "int" | "INT" | "abs" | "ABS" | "min" | "MIN" | "max" | "MAX" |
+			  "mod" | "MOD" | "modulo" | "MODULO" | "sign" | "SIGN" | "dim" | "DIM" | "dprod" | "DPROD" |
+			  "product" | "PRODUCT" | "sum" | "SUM" | "any" | "ANY" | "all" | "ALL" | "allocated" | "ALLOCATED" |
+			  "associated" | "ASSOCIATED" | "present" | "PRESENT" | "bit_size" | "BIT_SIZE"
+%%
 /*************************/
 /*	FREE COMMENT CATCH	 */
 /*************************/
@@ -149,6 +169,7 @@ WRONG_TYPE  = {REAL} 			| {DOUBLE_PREC} | {COMPLEX} | {LOGICAL} | {CHAR}
 /*****************************/
 /* If an equal sign appears, we go straight to INDEX part. */
 <ENTER_DO>		{WHILE}			{yybegin(COMMENT);}
+<ENTER_DO>		{INTRIN_INT}{SPACE}*\(		{par=1; yybegin(PAR);}
 <ENTER_DO>		{STRUCT}			{}
 <ENTER_DO>		{VAR}			{if (wrongTypeVariables.contains(yytext())) { violation = true; variable = variable + " " + yytext(); }}
 <ENTER_DO>		\=				{yybegin(INDEX);}
@@ -160,6 +181,7 @@ WRONG_TYPE  = {REAL} 			| {DOUBLE_PREC} | {COMPLEX} | {LOGICAL} | {CHAR}
 /*****************************/
 /* We do nothing for integer, blank and end of line. Otherwise, an error is set. */
 <INDEX>			[0-9]+			{}
+<INDEX>			{INTRIN_INT}{SPACE}*\(		{par=1; yybegin(PAR);}
 <INDEX>			{STRUCT}			{}
 <INDEX>			{VAR}			{if (wrongTypeVariables.contains(yytext())) { violation = true; variable = variable + " " + yytext(); }}
 <INDEX>			\(				{par=1; yybegin(PAR);}

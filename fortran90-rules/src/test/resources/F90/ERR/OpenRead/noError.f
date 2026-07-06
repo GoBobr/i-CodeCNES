@@ -93,3 +93,20 @@ SUBROUTINE test_read_iostat()
            IOSTAT=io_stat) val
       IF (io_stat /= 0) RETURN
 END SUBROUTINE test_read_iostat
+
+! Test: IOSTAT check several lines after READ, with END IF in between
+program iostat_multiline_test
+  implicit none
+  integer :: io_stat
+  character(len=100) :: line
+  open(20, file='test.txt', status='old', action='read', iostat=io_stat)
+  if (io_stat /= 0) then
+    print *, 'Error opening file'
+    stop
+  end if
+  read(20, '(a)', iostat=io_stat) line
+  if (io_stat /= 0) then
+    print *, 'Error reading file'
+  end if
+  close(20)
+end program iostat_multiline_test

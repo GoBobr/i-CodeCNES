@@ -101,3 +101,28 @@ SUBROUTINE test_wrapper_call()
       DEALLOCATE(data_arr, STAT=err)
       IF (err /= 0) RETURN
 END SUBROUTINE test_wrapper_call
+
+! Test: ALLOCATE inside IF block with status check several lines later
+program alloc_if_test
+  implicit none
+  integer :: iostat
+  double precision, dimension(:), allocatable :: arr1, arr2
+  iostat = 0
+  if (iostat == 0) then
+    allocate(arr1(100), stat=iostat)
+  end if
+  if (iostat == 0) then
+    allocate(arr2(200), stat=iostat)
+  end if
+  if (iostat /= 0) then
+    print *, 'Allocation error'
+  end if
+  deallocate(arr1, stat=iostat)
+  if (iostat /= 0) then
+    print *, 'Deallocation error arr1'
+  end if
+  deallocate(arr2, stat=iostat)
+  if (iostat /= 0) then
+    print *, 'Deallocation error arr2'
+  end if
+end program alloc_if_test

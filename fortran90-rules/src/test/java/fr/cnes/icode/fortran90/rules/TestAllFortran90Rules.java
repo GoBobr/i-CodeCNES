@@ -68,7 +68,7 @@ public class TestAllFortran90Rules implements ICodeCheckerTester {
                 {"/F90/DATA/ArrayAccess/error.f", "/F90/DATA/ArrayAccess/noError.f", new int[]{10}, new String[]{"program ESSAI"}, F90DATAArrayAccess.class},
                 {"/F90/DATA/Constant/error.f", "/F90/DATA/Constant/noError.f", new int[]{64, 86}, new String[]{"FUNCTION FUNC_1", "FUNCTION FUNC_2"}, F90DATAConstant.class},
                 {"/F90/DATA/ConstantFloat/error.f", "/F90/DATA/ConstantFloat/noError.f", new int[]{27}, new String[]{"PROGRAM ESSAI"}, F90DATAConstantFloat.class},
-                {"/F90/DATA/Declaration/error.f", "/F90/DATA/Declaration/noError.f", new int[]{38, 47, 48}, new String[]{"subroutine changer_coordonnees", "subroutine changer_coordonnees", "subroutine changer_coordonnees"}, F90DATADeclaration.class},
+                {"/F90/DATA/Declaration/error.f", "/F90/DATA/Declaration/noError.f", new int[]{47, 48}, new String[]{"subroutine changer_coordonnees", "subroutine changer_coordonnees"}, F90DATADeclaration.class},
                 {"/F90/DATA/Float/error.f90", "/F90/DATA/Float/noError.f90", new int[]{20, 20}, new String[]{"subroutine format_etoile", "subroutine format_etoile"}, F90DATAFloat.class},
                 {"/F90/DATA/Parameter/error.f90", "/F90/DATA/Parameter/noError.f90", new int[]{13, 14, 15, 16, 17, 18, 56, 57, 58, 59, 60, 61}, new String[]{"MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI", "PROGRAM ESSAI"}, F90DATAParameter.class},
                 {"/F90/DESIGN/Free/error.f", "/F90/DESIGN/Free/noError.f", new int[]{103}, new String[]{"SUBROUTINE Desallouer_Tableau"}, F90DESIGNFree.class},

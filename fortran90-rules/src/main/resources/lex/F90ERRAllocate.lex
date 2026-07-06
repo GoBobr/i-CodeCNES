@@ -164,14 +164,17 @@ SPACE		 = [\ \t\f]
 /************************/
 /* ALL_CHECK STATE      */
 /************************/
+<ALL_CHECK>		"end"{SPACE}*"if"	{stat = ""; descr = ""; yybegin(NEW_LINE);}
 <ALL_CHECK>		{IF}			{yybegin(ALLOCATED);}
 <ALL_CHECK>		{ALLOC}			{setError(location,"The status of the ALLOCATE or DEALLOCATE instruction is not checked", yyline);
 								 descr = yytext().toUpperCase(); yybegin(ALLOCATE);}
+<ALL_CHECK>		{TYPE}			{setError(location,"The status of the ALLOCATE or DEALLOCATE instruction is not checked", yyline);
+								 stat = ""; descr = ""; location = yytext(); yybegin(NAMING);}
 <ALL_CHECK>		{VAR}			{}
 <ALL_CHECK>		{SPACE}			{}
 <ALL_CHECK>		\&{SPACE}*\n		{}
 <ALL_CHECK>		\n				{setError(location,"The status of the ALLOCATE or DEALLOCATE instruction is not checked", yyline);
-								 stat = ""; descr = ""; yybegin(NEW_LINE);}
+								stat = ""; descr = ""; yybegin(NEW_LINE);}
 <ALL_CHECK>		.				{}
 								 
 /************************/
