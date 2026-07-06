@@ -43,7 +43,7 @@ import fr.cnes.icode.exception.JFlexException;
 /* and when nothing special is happening (LINE). These states are not supposed 	*/
 /* to be deleted. However, some modifications can be made to the transitions    */
 /* and some new states can be added.											*/
-%state COMMENT, NAMING, NEW_LINE, LINE, WAIT, IMPLICITE, INTERFACE, WAIT_2, SAVE, WAIT_3
+%state COMMENT, NAMING, NEW_LINE, LINE, WAIT, IMPLICITE, INTERFACE, WAIT_2, SAVE, WAIT_3, USE_STATE
 
 /* These are the words which are involved in automaton's transition. 	*/
 /* COMMENT_WORD determines when a comment start.						*/
@@ -105,6 +105,9 @@ CLE	         = {MOTS_CLES} | {INTRIN}
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 STRING		 = \'[^\']*\' | \"[^\"]*\"
 SPACE		 = [\ \t\f\r]
+LOGIC_OP	 = "\.and\."|"\.or\."|"\.not\."|"\.eqv\."|"\.neqv\."|"\.AND\."|"\.OR\."|"\.NOT\."|"\.EQV\."|"\.NEQV\."
+CALL_VAR	 = ("call"|"CALL"){SPACE}+{VAR}
+TYPE_NAME	 = ("type"|"TYPE"|"class"|"CLASS"){SPACE}*\({SPACE}*{VAR}{SPACE}*\)
 
 /* Variable "location" is used to determine rule's error location (function,	*/
 /* procedure, etc.).															*/
@@ -197,6 +200,9 @@ SPACE		 = [\ \t\f\r]
 			{COMMENT_LINE}				{}
 			"use"						{yybegin(WAIT);}
 			"implicit"{SPACE}*"none"	{yybegin(NEW_LINE);}
+			{CLE}						{}
+			{LOGIC_OP}					{}
+			\&{SPACE}*\n				{}
 			{DATA_TYPE}					{setError(location,"The sequence IMPLICIT NONE must be declared after the method. ", line); yybegin(LINE);
 										 yybegin(WAIT_2);}
 			{VAR}						{setError(location,"The sequence IMPLICIT NONE must be declared after the method. ", line); yybegin(LINE);}
@@ -228,9 +234,12 @@ SPACE		 = [\ \t\f\r]
 			"interface"				{yybegin(INTERFACE);}
 			{END_TYPE}				{yybegin(COMMENT);}
 			{DATA_TYPE}				{yybegin(WAIT_2);}
-			"use"					{yybegin(COMMENT);}
+			{TYPE_NAME}				{}
+			{CALL_VAR}				{}
+			"use"					{yybegin(USE_STATE);}
 			"private"				{yybegin(SAVE);}
 			{CLE}					{}
+			{LOGIC_OP}				{}
 			(\%{VAR})+				{}
 			{VAR}{SPACE}*\(			{parenthese=1; yybegin(WAIT_3);}
 			{VAR}					{if (!variables.contains(yytext())){
@@ -256,9 +265,12 @@ SPACE		 = [\ \t\f\r]
 			"COMMON" | "NAMELIST"	{yybegin(SAVE);}
 			"interface"				{yybegin(INTERFACE);}
 			{END_TYPE}				{yybegin(COMMENT);}
-			"use"					{yybegin(COMMENT);}
+			{TYPE_NAME}				{}
+			{CALL_VAR}				{}
+			"use"					{yybegin(USE_STATE);}
 			"private"				{yybegin(SAVE);}
 			{CLE}					{}
+			{LOGIC_OP}				{}
 			(\%{VAR})+				{}
 			{VAR}{SPACE}*\(			{parenthese=1; yybegin(WAIT_3);}
 			{VAR}					{if (!variables.contains(yytext())){
@@ -270,6 +282,19 @@ SPACE		 = [\ \t\f\r]
       		.              			{}
       	}
       	
+/************************/
+/* USE_STATE        	 */
+/************************/
+<USE_STATE>
+		{
+			{COMMENT_LINE}				{}
+			"only"{SPACE}*:			{}
+			{VAR}					{variables.add(yytext().toLowerCase());}
+			\&{SPACE}*\n			{}
+			\n              			{yybegin(NEW_LINE);}
+      		.               		{}
+		}
+
 /************************/
 /* WAIT_3       		 */
 /************************/
