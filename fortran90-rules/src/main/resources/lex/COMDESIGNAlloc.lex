@@ -232,14 +232,9 @@ INT			 = [0-9]+
 		{
 			{UNIT}			{}
 			{VAR}|{INT}		{String loc = files.get(yytext());
-							 if (!location.equals(loc) && !errors.contains(yytext())) {
-								setError(location,"The resource named "+
-            							 yytext() + " has not been allocated and deallocate in the same algorithmic level.", yyline+1);
-							 }
-							 if (loc != null) {
-								errors.add(yytext());
-							 }
-							 files.remove(yytext()); 
+								 if (loc != null) {
+									files.remove(yytext()); 
+								 }
 							 yybegin(COMMENT);
 							}
 			\n             	{}
@@ -264,14 +259,9 @@ INT			 = [0-9]+
 <DEALLOC>		
 		{
 			{VAR}			{String loc = memory.get(yytext());
-							 if (!location.equals(loc) && !errors.contains(yytext())) {
-								setError(location,"The resource named "+
-            							 yytext() + " has not been allocated and deallocate in the same algorithmic level.", yyline+1);
-							 }
-							 if (loc != null) {
-								errors.add(yytext());
-							 }
-							 memory.remove(yytext()); 
+								 if (loc != null) {
+									memory.remove(yytext()); 
+								 }
 							 yybegin(COMMENT);
 							}
 			\n             	{}

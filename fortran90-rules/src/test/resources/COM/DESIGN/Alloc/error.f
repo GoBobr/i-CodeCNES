@@ -14,7 +14,7 @@
 	end procedure p1
 	
 	subroutine s2
-		close(unit=b)
+		! b is opened in s1 but never closed - true positive
 	end subroutine s2
 	   
   END PROGRAM

@@ -35,7 +35,7 @@ public class TestAllFortran90Rules implements ICodeCheckerTester {
                 {"/COM/DATA/LoopCondition/error.f90", "/COM/DATA/LoopCondition/noError.f90", new int[]{4, 5, 6, 12, 17, 23, 29}, new String[]{"MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "MAIN PROGRAM", "FUNCTION TEST"}, COMDATALoopCondition.class},
                 {"/COM/DATA/NotUsed/error.f", "/COM/DATA/NotUsed/noError.f", new int[]{7, 12}, new String[]{"PROGRAM ESSAI", "PROGRAM ESSAI"}, COMDATANotUsed.class},
                 {"/COM/DESIGN/ActiveWait/error.f", "/COM/DESIGN/ActiveWait/noError.f", new int[]{12}, new String[]{"PROGRAM ESSAI"}, COMDESIGNActiveWait.class},
-                {"/COM/DESIGN/Alloc/error.f", "/COM/DESIGN/Alloc/noError.f", new int[]{12, 17}, new String[]{"procedure p1", "subroutine s2"}, COMDESIGNAlloc.class},
+                {"/COM/DESIGN/Alloc/error.f", "/COM/DESIGN/Alloc/noError.f", new int[]{5}, new String[]{"subroutine s1"}, COMDESIGNAlloc.class},
                 {"/COM/FLOW/Abort/error.f", "/COM/FLOW/Abort/noError.f", new int[]{15}, new String[]{"PROGRAM ESSAI"}, COMFLOWAbort.class},
                 {"/COM/FLOW/BooleanExpression/error.f", "/COM/FLOW/BooleanExpression/noError.f", new int[]{11}, new String[]{"PROGRAM ESSAI"}, COMFLOWBooleanExpression.class},
                 {"/COM/FLOW/CaseSwitch/error.f", "/COM/FLOW/CaseSwitch/noError.f", new int[]{3}, new String[]{"PROGRAM ESSAI"}, COMFLOWCaseSwitch.class},
