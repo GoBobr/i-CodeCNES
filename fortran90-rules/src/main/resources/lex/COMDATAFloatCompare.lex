@@ -54,6 +54,8 @@ FALSE        = [a-zA-Z0-9\_]({TYPE}) | ({TYPE})[a-zA-Z0-9\_] | [a-zA-Z0-9\_]({TY
 SPACE        = [\ \t\f]
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 STRING		 = \'[^\']*\' | \"[^\"]*\"
+LOGIC_OP	 = "\.and\."|"\.or\."|"\.not\."|"\.eqv\."|"\.neqv\."|"\.AND\."|"\.OR\."|"\.NOT\."|"\.EQV\."|"\.NEQV\."
+STRUCT		 = {VAR}\%
 
 /* Two lists are created. The first one contains all declared variables. The second	*/
 /* one stands for all variables in one instruction.								 	*/
@@ -126,7 +128,7 @@ NO_ERR_FUNC	 =  ([^a-zA-Z0-9\_])?("achar" | "adjustl" | "adjustr" | "all" | "all
 							   "maxexponent" | "maxloc" | "merge_bits" | "minexponent" | "minloc" | "modulo" | "new_line" | "nint" | "not" | 
 							   "null" | "num_images" | "popcnt" | "poppar" | "radix" | "range" | "repeat" | "scan" | "selected_char_kind" | 
 							   "selected_int_kind" | "selected_real_kind" | "shape" | "shifta" | "shiftl" | "shiftr" | "size" | "storage_size" | 
-							   "this_image" | "trailz" | "trim" | "ubound" | "ucobound" | "verify" | "amin0" | "dint" | "dnint"){SPACE}*"("
+			   "this_image" | "trailz" | "trim" | "ubound" | "ucobound" | "verify" | "amin0" | "dint" | "dnint"| "omp_get_thread_num" | "omp_get_num_threads" | "omp_get_max_threads" | "omp_in_parallel" | "omp_get_level" | "omp_get_ancestor_thread_num"){SPACE}*"("
 FUNCTION	 = {VAR}{SPACE}*"("
 DATA_TYPE	 = ("integer" | "logical" | "character" ) ( {SPACE} | {SPACE}*"(" | {SPACE}*"," | {SPACE}*"*" ) 
 
@@ -236,6 +238,8 @@ DATA_TYPE	 = ("integer" | "logical" | "character" ) ( {SPACE} | {SPACE}*"(" | {S
 								 }
 								}
 			"("					{brace = brace + 1;}
+			{LOGIC_OP}			{}
+			{STRUCT}			{firstFloat = false;}
 			{VAR}				{if (!isIgnored) {
 									if (allVariables.contains(yytext().toLowerCase())){
 										if (canSetError && !added){
@@ -300,6 +304,8 @@ DATA_TYPE	 = ("integer" | "logical" | "character" ) ( {SPACE} | {SPACE}*"(" | {S
 							 canSetError = true;
 							 yybegin(BRACE);}
 			{RULE_WORD}		{yybegin(INIT);}
+			{LOGIC_OP}		{}
+			{STRUCT}		{firstFloat = false;}
 			{VAR}			{if (!added){
 								if (allVariables.contains(yytext().toLowerCase())) {
 									this.setError(location,"It's not allowed to compare float variables (" + 
@@ -322,6 +328,8 @@ DATA_TYPE	 = ("integer" | "logical" | "character" ) ( {SPACE} | {SPACE}*"(" | {S
 		{
 			{COMMENT_LINE}	{}
 			{STRING}		{}
+			{LOGIC_OP}		{firstFloat = false;}
+			{STRUCT}		{firstFloat = false;}
 			{FALSE}			{if (allVariables.contains(yytext().toLowerCase())){
 								currentVariable = yytext().toLowerCase();
 								firstFloat = true;
