@@ -85,7 +85,7 @@ public class TestAllFortran90Rules implements ICodeCheckerTester {
                 {"/F90/INST/Equivalence/error.f90", "/F90/INST/Equivalence/noError.f90", new int[]{10}, new String[]{"program ESSAI"}, F90INSTEquivalence.class},
                 {"/F90/INST/If/error.f90", "/F90/INST/If/noError.f90", new int[]{34}, new String[]{"program ESSAI"}, F90INSTIf.class},
                 {"/F90/INST/Intent/error.f90", "/F90/INST/Intent/noError.f90", new int[]{38, 39, 40}, new String[]{"subroutine Mouv", "subroutine Mouv", "subroutine Mouv"}, F90INSTIntent.class},
-                {"/F90/INST/Nullify/error.f", "/F90/INST/Nullify/noError.f", new int[]{5}, new String[]{"program ESSAI"}, F90INSTNullify.class},
+                {"/F90/INST/Nullify/error.f", "/F90/INST/Nullify/noError.f", new int[]{7}, new String[]{"program ESSAI"}, F90INSTNullify.class},
                 {"/F90/INST/Only/error.f", "/F90/INST/Only/noError.f", new int[]{73}, new String[]{"program ESSAI"}, F90INSTOnly.class},
                 {"/F90/INST/Operator/error.f", "/F90/INST/Operator/noError.f", new int[]{34, 49, 61, 70, 75, 84, 88, 100, 100, 107, 117}, new String[]{"program ESSAI", "program ESSAI", "program ESSAI", "program ESSAI", "program ESSAI", "program ESSAI", "program ESSAI", "program ESSAI", "program ESSAI", "program ESSAI", "program ESSAI"}, F90INSTOperator.class},
                 {"/F90/INST/Pointer/error.f", "/F90/INST/Pointer/noError.f", new int[]{32, 33}, new String[]{"program ESSAI", "program ESSAI"}, F90INSTPointer.class},

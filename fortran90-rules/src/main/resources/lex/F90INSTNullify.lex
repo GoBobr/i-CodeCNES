@@ -17,9 +17,10 @@ package fr.cnes.icode.fortran90.rules;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.File;
+import java.util.HashSet;
 import java.util.LinkedList;
-
 import java.util.List;
+import java.util.Set;
 
 import fr.cnes.icode.exception.JFlexException;
 import fr.cnes.icode.data.AbstractChecker;
@@ -38,18 +39,23 @@ import fr.cnes.icode.data.CheckResult;
 %yylexthrow JFlexException
 %type List<CheckResult>
 
-%state COMMENT, NAMING, NEW_LINE, LINE, DEALLOC, SET_NULL, NULL_VAR
+%state COMMENT, NAMING, NEW_LINE, LINE, DEALLOC, SET_NULL, NULL_VAR, DECL
 
 COMMENT_WORD = "!"
-TYPE		 = "function"  | "procedure" | "subroutine"  | "program" | "module" |"interface"
+TYPE			 = "function"  | "procedure" | "subroutine"  | "program" | "module" |"interface"
 FALSE        = [a-zA-Z0-9\_]({TYPE}) | ({TYPE})[a-zA-Z0-9\_] | [a-zA-Z0-9\_]({TYPE})[a-zA-Z0-9\_]
 			   | [^a-zA-Z0-9\_]("module")({SPACE}*)("procedure")[^a-zA-Z0-9\_]
 SPACE        = [\ \t\f]
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*(\%[a-zA-Z][a-zA-Z0-9\_]*)*
-STRING		 = \'[^\']*\' | \"[^\"]*\"
+STRING			 = \'[^\']*\' | \"[^\"]*\"
 
 DEALLOCATE	 = [^a-zA-Z0-9\_]("deallocate"){SPACE}*("(")
-NULLIFY		 = [^a-zA-Z0-9\_]("nullify"){SPACE}*("(")
+NULLIFY			 = [^a-zA-Z0-9\_]("nullify"){SPACE}*("(")
+
+DATA_TYPE	 = ("integer"  | "real"     | "complex"     | "double"{SPACE}*("precision") |
+			   "logical"  | "character" | "type"){SPACE}*("(")?
+POINTER_ATTR = "pointer"
+ALLOCATABLE_ATTR = "allocatable"
 
 %{
 	/** Variable used to store violation location and variable involved. **/
@@ -60,6 +66,13 @@ NULLIFY		 = [^a-zA-Z0-9\_]("nullify"){SPACE}*("(")
 	List<Integer> lines = new LinkedList<Integer>();
 	int errorLine = 0;
 	boolean isPointer = false;
+	/** Set of variables declared with POINTER attribute. **/
+	Set<String> pointerVars = new HashSet<String>();
+	/** Set of variables declared with ALLOCATABLE attribute. **/
+	Set<String> allocatableVars = new HashSet<String>();
+	/** Flag: next variables in DECL are POINTER. **/
+	boolean declIsPointer = false;
+	boolean declIsAllocatable = false;
 	
 	public F90INSTNullify() {
     }
@@ -123,6 +136,7 @@ NULLIFY		 = [^a-zA-Z0-9\_]("nullify"){SPACE}*("(")
 			{TYPE}        	{raiseRemainingErrors();
 							 location = yytext(); 
 							 yybegin(NAMING);}
+			{DATA_TYPE}		{declIsPointer = false; declIsAllocatable = false; yybegin(DECL);}
 			{DEALLOCATE}	{errorLine = yyline + 1; yybegin(DEALLOC);}
 			{NULLIFY}		{yybegin(NULL_VAR);}
 			{VAR}			{if(pointers.contains(yytext())) {
@@ -141,11 +155,14 @@ NULLIFY		 = [^a-zA-Z0-9\_]("nullify"){SPACE}*("(")
 <DEALLOC>		
 		{
 			{VAR}			{if(!isPointer) { 
+							// Only require NULLIFY for POINTER variables, not ALLOCATABLE
+							if (pointerVars.contains(yytext()) && !allocatableVars.contains(yytext())) {
 								pointers.add(yytext()); 
 								lines.add(errorLine);
 								isPointer = true; 
-							 } 
 							}
+						 } 
+						}
 			\n				{isPointer = false; yybegin(YYINITIAL);}
 			.				{}
 		}
@@ -164,8 +181,20 @@ NULLIFY		 = [^a-zA-Z0-9\_]("nullify"){SPACE}*("(")
 			.				{}
 		}
 		
+/************************//* DECL STATE           */
 /************************/
-/* THROW ERROR          */
+<DECL>		
+		{
+			{POINTER_ATTR}		{declIsPointer = true;}
+			{ALLOCATABLE_ATTR}	{declIsAllocatable = true;}
+			::					{}
+			{VAR}			{if(declIsPointer) pointerVars.add(yytext());
+							 if(declIsAllocatable) allocatableVars.add(yytext());}
+			\n             	{declIsPointer = false; declIsAllocatable = false; yybegin(YYINITIAL);}
+			.				{}
+		}
+		
+/************************//* THROW ERROR          */
 /************************/
 				[^]            {
                                     

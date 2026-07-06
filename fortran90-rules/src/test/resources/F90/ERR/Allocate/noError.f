@@ -77,3 +77,27 @@ PROGRAM ESSAI
       endif 
 
 END PROGRAM ESSAI
+
+! Wrapper subroutine that internally uses ALLOCATE with STAT= — should NOT trigger
+! the rule at the CALL site (the word "allocate" in "lintran_allocate" must not match)
+SUBROUTINE lintran_allocate(n, arr, error_code)
+      INTEGER, INTENT(IN) :: n
+      REAL, DIMENSION(:), ALLOCATABLE, INTENT(INOUT) :: arr
+      INTEGER, INTENT(OUT) :: error_code
+      ALLOCATE(arr(n), STAT=error_code)
+      IF (error_code /= 0) RETURN
+END SUBROUTINE lintran_allocate
+
+SUBROUTINE test_wrapper_call()
+      REAL, DIMENSION(:), ALLOCATABLE :: data_arr
+      INTEGER :: err
+      ! This CALL contains "allocate" in the subroutine name — must NOT trigger
+      CALL lintran_allocate(100, data_arr, err)
+      IF (err /= 0) RETURN
+      ! Multi-line ALLOCATE with continuation — STAT= on next line
+      ALLOCATE(data_arr(200), &
+               STAT=err)
+      IF (err /= 0) RETURN
+      DEALLOCATE(data_arr, STAT=err)
+      IF (err /= 0) RETURN
+END SUBROUTINE test_wrapper_call

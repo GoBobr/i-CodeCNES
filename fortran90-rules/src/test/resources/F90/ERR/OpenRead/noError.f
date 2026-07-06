@@ -80,3 +80,16 @@
 !
       STOP
       END PROGRAM ESSAI
+
+! Test: READ with asterisk unit and IOSTAT — should NOT trigger
+SUBROUTINE test_read_iostat()
+      INTEGER :: io_stat, val
+      READ(*, *, IOSTAT=io_stat) val
+      IF (io_stat /= 0) THEN
+         RETURN
+      END IF
+      ! Multi-line READ with continuation and IOSTAT
+      READ(*, *, &
+           IOSTAT=io_stat) val
+      IF (io_stat /= 0) RETURN
+END SUBROUTINE test_read_iostat

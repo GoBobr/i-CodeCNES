@@ -127,6 +127,7 @@ SPACE		 = [\ \t\f]
 <YYINITIAL>		{STRING}		{yybegin(LINE);}
 <YYINITIAL>		{TYPE}        	{location = yytext(); yybegin(NAMING);}
 <YYINITIAL>		{ALLOC}			{descr = yytext().toUpperCase(); yybegin(ALLOCATE);}
+<YYINITIAL>		{VAR}			{yybegin(LINE);}
 <YYINITIAL> 	\n             	{yybegin(NEW_LINE);}
 <YYINITIAL> 	.              	{yybegin(LINE);}
 
@@ -136,6 +137,7 @@ SPACE		 = [\ \t\f]
 /************************/
 <NEW_LINE>  	{TYPE}         	{location = yytext(); yybegin(NAMING);}
 <NEW_LINE>		{ALLOC}			{descr = yytext().toUpperCase(); yybegin(ALLOCATE);}
+<NEW_LINE>		{VAR}			{yybegin(LINE);}
 <NEW_LINE>  	\n             	{}
 <NEW_LINE>  	.              	{yybegin(LINE);}
 
@@ -145,6 +147,7 @@ SPACE		 = [\ \t\f]
 /************************/
 <LINE>  		{TYPE}         	{location = yytext(); yybegin(NAMING);}
 <LINE>			{ALLOC}			{descr = yytext().toUpperCase(); yybegin(ALLOCATE);}
+<LINE>			{VAR}			{}
 <LINE>      	\n             	{yybegin(NEW_LINE);}
 <LINE>      	.              	{}
 
@@ -153,6 +156,7 @@ SPACE		 = [\ \t\f]
 /* ALLOCATE STATE       */
 /************************/
 <ALLOCATE>		{STAT}			{stat=yytext().split("=")[1].trim();}
+<ALLOCATE>		\&{SPACE}*\n		{}
 <ALLOCATE>		\n				{yybegin(ALL_CHECK);}
 <ALLOCATE>		.				{}
 
@@ -165,6 +169,7 @@ SPACE		 = [\ \t\f]
 								 descr = yytext().toUpperCase(); yybegin(ALLOCATE);}
 <ALL_CHECK>		{VAR}			{}
 <ALL_CHECK>		{SPACE}			{}
+<ALL_CHECK>		\&{SPACE}*\n		{}
 <ALL_CHECK>		\n				{setError(location,"The status of the ALLOCATE or DEALLOCATE instruction is not checked", yyline);
 								 stat = ""; descr = ""; yybegin(NEW_LINE);}
 <ALL_CHECK>		.				{}

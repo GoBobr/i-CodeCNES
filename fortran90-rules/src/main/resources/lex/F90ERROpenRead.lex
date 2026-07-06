@@ -186,7 +186,7 @@ IOSTAT 		 = ("iostat") {SPACE}* \= {SPACE}* {VAR}
 								 iostatVal = yytext().replace(" ","").split("=")[1];}
 			{VAR}				{if(!add) {     // if the first value read and existing file opened -> verify iostat
 								 	if (!files.contains(yytext())) {
-								 		yybegin(YYINITIAL);
+								 		add=true; // not a file unit — keep scanning for IOSTAT
 								 	} else {
 								 		add=true;
 								 }}}
