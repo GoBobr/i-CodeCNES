@@ -53,6 +53,8 @@ TYPE		 = {FUNC}     | {PROC}	   | {SUB} | {PROG} | {MOD}	| {INTER}
 RETURN		 = "RETURN"
 END			 = "END"
 END_TYPE	 = {END} [\ ]+ {TYPE}
+IF_KW		 = ([^a-zA-Z0-9\_])?("if"|"IF")([\ \t]*\()
+COMP		 = "/="|"=="|"\.eq\."|"\.ne\."|"\.EQ\."|"\.NE\."|"\.lt\."|"\.le\."|"\.gt\."|"\.ge\."|"\.LT\."|"\.LE\."|"\.GT\."|"\.GE\."
 VAR		     = [a-zA-Z][a-zA-Z0-9\_]*
 STRING		 = \'[^\']*\' | \"[^\"]*\"
 																
@@ -61,6 +63,8 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
     private String parsedFileName;
 	List<String> loc = new LinkedList<String>();
 	boolean returnExist = false;
+	boolean lineHasIf = false;
+	boolean lineHasCompare = false;
 	
 	public COMFLOWExit(){
 		loc.add(location);
@@ -116,6 +120,8 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 <NEW_LINE>  	{COMMENT_WORD} 	{yybegin(COMMENT);}
 <NEW_LINE>		{STRING}		{}
 <NEW_LINE>		{TYPE}        	{location = yytext(); yybegin(NAMING);}
+<NEW_LINE>		{IF_KW}			{lineHasIf = true;}
+<NEW_LINE>		{COMP}			{lineHasCompare = true;}
 <NEW_LINE>		{END_TYPE}		{
 									if(loc.isEmpty()){
 										
@@ -132,13 +138,15 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 					                    throw new JFlexException(this.getClass().getName(), parsedFileName,
                                     errorMessage, yytext(), yyline, yycolumn);
 							 	 }
+								 if(!lineHasIf || !lineHasCompare){
 								 if(returnExist){
 								 	setError(loc.get(loc.size()-1),"There is more than one exit in the function.", yyline+1);
 								 }else{
 								 	returnExist = true;
 								 }
+								 }
 								}
-<NEW_LINE>  	\n             	{}
+<NEW_LINE>  	\n             		{lineHasIf = false; lineHasCompare = false;}
 <NEW_LINE>  	.              	{yybegin(LINE);}
 
 
@@ -147,6 +155,8 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 /************************/
 <LINE>			{STRING}		{}
 <LINE>			{TYPE}        	{location=yytext(); yybegin(NAMING);}
+<LINE>			{IF_KW}			{lineHasIf = true;}
+<LINE>			{COMP}			{lineHasCompare = true;}
 <LINE>			{END_TYPE}		{
 									if(loc.isEmpty()){
 										
@@ -163,13 +173,15 @@ STRING		 = \'[^\']*\' | \"[^\"]*\"
 					                    throw new JFlexException(this.getClass().getName(), parsedFileName,
                                     errorMessage, yytext(), yyline, yycolumn);
 							 	 }
+								 if(!lineHasIf || !lineHasCompare){ 
 								 if(returnExist){ 
 								 	setError(loc.get(loc.size()-1),"There is more than one exit in the function.", yyline+1);
 								 }else{ 
 								 	returnExist = true;
 								 }
+								 }
 								}
-<LINE>      	\n             	{yybegin(NEW_LINE);}
+<LINE>      	\n             		{lineHasIf = false; lineHasCompare = false; yybegin(NEW_LINE);}
 <LINE>      	.              	{}
 
 
